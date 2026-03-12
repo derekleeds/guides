@@ -11,7 +11,7 @@
   name = "OpenClaw"
   url = "/categories/openclaw/"
   weight = 20
-  pre = "fa-robot"
+  pre = "🦞"
 
 [[main]]
   name = "Memory Management"
