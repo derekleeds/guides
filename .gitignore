@@ -1,7 +1,17 @@
-# Hugo
-/public/
-/resources/_gen/
+# Hugo settings
+/hugo.lock
 /.hugo_build.lock
+
+# Generated resources
+/resources/_gen/
+/public/
+
+# Dependencies
+/node_modules/
+/package-lock.json
+
+# Theme (managed by git submodule)
+/themes/docsy/
 
 # OS
 .DS_Store
