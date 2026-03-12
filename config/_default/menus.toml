@@ -1,25 +1,32 @@
-# Main navigation menu
+# Main navigation menu with Font Awesome icons
+# Icons use Font Awesome classes: fas (solid), fab (brands), far (regular)
+
 [[main]]
   name = "Infrastructure"
   url = "/categories/infrastructure/"
   weight = 10
+  pre = "fa-server"
 
 [[main]]
   name = "OpenClaw"
   url = "/categories/openclaw/"
   weight = 20
+  pre = "fa-robot"
 
 [[main]]
   name = "Memory Management"
   url = "/categories/memory-management/"
   weight = 30
+  pre = "fa-brain"
 
 [[main]]
   name = "Archives"
   url = "/archives/"
   weight = 40
+  pre = "fa-book"
 
 [[main]]
   name = "About"
   url = "/about/"
   weight = 50
+  pre = "fa-user"
