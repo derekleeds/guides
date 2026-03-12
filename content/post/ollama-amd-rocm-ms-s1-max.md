@@ -126,5 +126,4 @@ ollama run gpt-oss:20b "Hello"
 
 ## References
 
-- [memory/semantic/ms-s1-max-gpu-setup.md](https://github.com/derekleeds/openclaw/workspace/memory/semantic/ms-s1-max-gpu-setup.md) - Full configuration details
 - [Ollama ROCm](https://github.com/ollama/ollama/blob/main/docs/docker.md#amd--rocm) - Official ROCm image
