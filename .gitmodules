@@ -1,7 +1,4 @@
 [submodule "themes/docsy"]
 	path = themes/docsy
 	url = https://github.com/google/docsy.git
-	branch = v0.7.2
-[submodule "assets/vendor/Font-Awesome"]
-	path = assets/vendor/Font-Awesome
-	url = https://github.com/FortAwesome/Font-Awesome.git
+	branch = v0.9.0
