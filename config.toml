@@ -1,27 +1,26 @@
 baseURL = "https://guides.derekleeds.cloud/"
 languageCode = "en-us"
 title = "Derek's Guides"
-theme = "github.com/google/docsy"
+theme = "docsy"
 enableGitInfo = true
 
 # Navigation
-[menu]
-  [[menu.main]]
-    name = "Home"
-    url = "/"
-    weight = 1
-  [[menu.main]]
-    name = "Memory Management"
-    url = "/posts/memory-management/"
-    weight = 10
-  [[menu.main]]
-    name = "Infrastructure"
-    url = "/posts/infrastructure/"
-    weight = 20
-  [[menu.main]]
-    name = "OpenClaw"
-    url = "/posts/openclaw/"
-    weight = 30
+[[menu.main]]
+  name = "Home"
+  url = "/"
+  weight = 1
+[[menu.main]]
+  name = "Memory Management"
+  url = "/posts/memory-management/"
+  weight = 10
+[[menu.main]]
+  name = "Infrastructure"
+  url = "/posts/infrastructure/"
+  weight = 20
+[[menu.main]]
+  name = "OpenClaw"
+  url = "/posts/openclaw/"
+  weight = 30
 
 # Markdown settings
 [markup]
@@ -41,6 +40,7 @@ enableGitInfo = true
   [params.ui]
     sidebar_menu_compact = true
     breadcrumb_disable = false
+    navbar_translucent_over_cover_disable = false
     
   [params.links]
     [[params.links.developer]]
