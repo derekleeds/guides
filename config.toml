@@ -1,13 +1,8 @@
 baseURL = "https://guides.derekleeds.cloud/"
 languageCode = "en-us"
 title = "Derek's Guides"
-theme = "docsy"
+theme = ["github.com/google/docsy"]
 enableGitInfo = true
-
-# Required for docsy theme
-[module]
-  [[module.imports]]
-    path = "github.com/google/docsy"
 
 # Navigation
 [[menu.main]]
