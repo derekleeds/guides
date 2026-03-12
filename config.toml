@@ -37,6 +37,10 @@ enableGitInfo = true
   description = "How-to guides for AI agents, homelab, and self-hosting"
   author = "Derek Leeds"
   
+  # Use CDN for Font-Awesome instead of module
+  [params.assets]
+    fontawesome = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  
   [params.ui]
     sidebar_menu_compact = true
     breadcrumb_disable = false
