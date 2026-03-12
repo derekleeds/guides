@@ -1,9 +1,0 @@
-# Hugo settings for Cloudflare Pages
-
-[build]
-publish = "public"
-command = "npm install && hugo --gc --minify"
-
-[build.environment]
-HUGO_VERSION = "0.121.0"
-NODE_VERSION = "18"

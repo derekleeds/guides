@@ -1,23 +1,18 @@
-# Hugo settings
-/hugo.lock
-/.hugo_build.lock
-
-# Generated resources
-/resources/_gen/
+# Hugo build output
 /public/
+/resources/_gen/
 
-# Dependencies
-/node_modules/
+# Hugo cache
+.hugo_build.lock
 
-# Theme (managed by git submodule)
-/themes/docsy/
-
-# OS
+# OS files
 .DS_Store
-Thumbs.db
+*.swp
+*.swo
 
 # IDE
 .idea/
 .vscode/
-*.swp
-*.swo
+
+# Go modules (Hugo)
+go.sum
