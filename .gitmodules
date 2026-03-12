@@ -1,6 +1,0 @@
-[submodule "themes/docsy"]
-	path = themes/docsy
-	url = https://github.com/google/docsy.git
-[submodule "assets/vendor/Font-Awesome"]
-	path = assets/vendor/Font-Awesome
-	url = https://github.com/FortAwesome/Font-Awesome.git

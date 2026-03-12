@@ -1,28 +1,8 @@
 baseURL = "https://guides.derekleeds.cloud/"
 languageCode = "en-us"
 title = "Derek's Guides"
-theme = "docsy"
 enableGitInfo = true
 
-# Navigation
-[[menu.main]]
-  name = "Home"
-  url = "/"
-  weight = 1
-[[menu.main]]
-  name = "Memory Management"
-  url = "/posts/memory-management/"
-  weight = 10
-[[menu.main]]
-  name = "Infrastructure"
-  url = "/posts/infrastructure/"
-  weight = 20
-[[menu.main]]
-  name = "OpenClaw"
-  url = "/posts/openclaw/"
-  weight = 30
-
-# Markdown settings
 [markup]
   [markup.goldmark]
     [markup.goldmark.renderer]
@@ -30,24 +10,10 @@ enableGitInfo = true
   [markup.tableOfContents]
     startLevel = 2
     endLevel = 4
-    ordered = false
 
-# Params for docsy
 [params]
   description = "How-to guides for AI agents, homelab, and self-hosting"
   author = "Derek Leeds"
-  
-  [params.ui]
-    sidebar_menu_compact = true
-    breadcrumb_disable = false
-    navbar_translucent_over_cover_disable = false
-    
-  [params.links]
-    [[params.links.developer]]
-      name = "GitHub"
-      url = "https://github.com/derekleeds/guides"
-      icon = "fab fa-github"
 
-# Outputs
 [outputs]
-  home = ["HTML", "RSS", "JSON"]
+  home = ["HTML", "RSS"]
