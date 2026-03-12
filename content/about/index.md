@@ -16,4 +16,4 @@ This site contains how-to guides for:
 
 Derek Leeds is a homelab enthusiast and AI agent developer. He runs [OpenClaw](https://openclaw.ai), an open-source agent orchestration platform.
 
-More about Derek at [derekleeds.cloud](https://derekleeds.cloud).
+More about Derek at [bio.derekleeds.cloud](https://bio.derekleeds.cloud/).
