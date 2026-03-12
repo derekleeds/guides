@@ -387,8 +387,8 @@ This reads `memory/episodic/`, extracts patterns, and writes to `memory/semantic
 
 - [Zep Memory Architecture](https://www.getzep.com/) - Research on structured memory
 - [OpenClaw GitHub](https://github.com/openclaw/openclaw) - Agent framework
-- [QMD - Queryable Memory Database](https://github.com/.../qmd)
-- [GraphThulhu MCP](https://github.com/.../graphthulhu)
+- [QMD - Queryable Memory Database](https://github.com/tobi/qmd)
+- [GraphThulhu MCP](https://github.com/skridlevsky/graphthulhu)
 - [discrawl - Discord Archive](https://github.com/steipete/discrawl)
 
 ## Next Steps
