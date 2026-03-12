@@ -80,9 +80,9 @@ Human memory has distinct systems - episodic (events), semantic (facts), and pro
 
 | Node | Role | IP | Services |
 |------|------|----|---------|
-| pnode200 | Legacy | 100.97.52.86 | (decommissioned) |
-| openclaw-node01 | Orchestration | 100.x.x.x | OpenClaw, QMD |
-| MS-S1-MAX | GPU Compute | 100.90.135.47 | Ollama, QMD MCP |
+| pnode200 | Legacy | 10.x.x.x | (decommissioned) |
+| openclaw-node01 | Orchestration | 10.x.x.x | OpenClaw, QMD |
+| MS-S1-MAX | GPU Compute | 10.x.x.x | Ollama, QMD MCP |
 
 ## QMD MCP Server
 
@@ -239,7 +239,7 @@ memory_search "how did we set up docker networking"
 → Returns relevant memory files with citations
 ```
 
-**External link:** [QMD on GitHub](https://github.com/.../qmd)
+**External link:** [QMD on GitHub](https://github.com/tobi/qmd)
 
 ### GraphThulhu (Knowledge Graph)
 
@@ -271,7 +271,7 @@ Obsidian vault → GraphThulhu MCP → Agent can query graph structure
 - Discover topic clusters
 - Search with context
 
-**External link:** [GraphThulhu MCP](https://github.com/.../graphthulhu)
+**External link:** [GraphThulhu MCP](https://github.com/skridlevsky/graphthulhu)
 
 ### discrawl (Discord Archive)
 
@@ -363,7 +363,7 @@ This reads `memory/episodic/`, extracts patterns, and writes to `memory/semantic
 
 1. Check index status: `qmd status`
 2. Update embeddings: `qmd update && qmd embed`
-3. Verify GPU/node sync: Check `qmd-mcp.tailbd8f6.ts.net/health`
+3. Verify GPU/node sync: Check health endpoint at `<qmd-mcp-endpoint>/health`
 
 ### Memory files not syncing
 
