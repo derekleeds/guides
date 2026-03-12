@@ -1,5 +1,5 @@
-# Main navigation menu with Font Awesome icons
-# Icons use Font Awesome classes: fas (solid), fab (brands), far (regular)
+# Main navigation menu with icons
+# Use Font Awesome classes (fa-*) or SVG paths (icons/filename.svg)
 
 [[main]]
   name = "Infrastructure"
@@ -11,7 +11,7 @@
   name = "OpenClaw"
   url = "/categories/openclaw/"
   weight = 20
-  pre = "🦞"
+  pre = "openclaw.svg"
 
 [[main]]
   name = "Memory Management"
