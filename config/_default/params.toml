@@ -1,0 +1,35 @@
+# Site parameters for Chirpy theme
+
+# Color mode: "light", "dark", or leave empty for auto
+# theme_mode = ""
+
+# Avatar image (place in assets/img/ or use URL)
+avatar = "/avatar.webp"
+
+# Table of contents in posts
+toc = true
+
+# Comments system (uncomment to enable)
+# [comments]
+#   active = "giscus"
+#   [comments.giscus]
+#     repo = "derekleeds/guides"
+#     repo_id = ""
+#     category = "Comments"
+#     category_id = ""
+#     mapping = "pathname"
+#     reactions_enabled = "1"
+
+# Social links for sidebar
+[social]
+  GitHub = "derekleeds"
+
+# Analytics (optional)
+# [analytics]
+#   google = "G-XXXXXXXXXX"
+
+# SEO
+[seo]
+  description = "How-to guides for AI agents, homelab infrastructure, and self-hosting"
+  author = "Derek Leeds"
+  keywords = ["homelab", "self-hosted", "AI agents", "infrastructure", "docker", "kubernetes", "openclaw"]

@@ -2,15 +2,34 @@
 
 How-to guides for AI agents, homelab infrastructure, and self-hosting.
 
-## About
-
-This site contains practical tutorials based on real-world experience building AI agents and homelab infrastructure.
+Built with [Hugo Theme Chirpy](https://github.com/geekifan/hugo-theme-chirpy).
 
 ## Topics
 
 - **Memory Management** - Three-tier memory architecture for AI agents
 - **Infrastructure** - Proxmox, Docker, Kubernetes, networking
 - **OpenClaw** - Agent orchestration and automation
+
+## Development
+
+```bash
+# Install Hugo extended
+brew install hugo
+
+# Clone with submodules
+git clone --recursive https://github.com/derekleeds/guides.git
+cd guides
+
+# Run local server
+hugo server
+
+# Build for production
+hugo --minify
+```
+
+## Deployment
+
+This site deploys to Cloudflare Pages. Push to `main` branch to deploy.
 
 ## Author
 

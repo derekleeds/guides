@@ -1,0 +1,7 @@
+[en]
+  languageName = "English"
+  languageCode = "en"
+  weight = 1
+  title = "Derek's Guides"
+  [en.params]
+    tagline = "How-to guides for AI agents, homelab, and self-hosting"
