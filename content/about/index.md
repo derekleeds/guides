@@ -1,6 +1,7 @@
 ---
 title: "About"
 description: "About Derek's Guides"
+layout: page
 ---
 
 # About Derek's Guides
