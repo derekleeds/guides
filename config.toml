@@ -1,7 +1,7 @@
 baseURL = "https://guides.derekleeds.cloud/"
 languageCode = "en-us"
 title = "Derek's Guides"
-theme = ["github.com/google/docsy"]
+theme = "docsy"
 enableGitInfo = true
 
 # Navigation
