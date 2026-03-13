@@ -9,6 +9,10 @@ avatar = "/avatar.webp"
 # Table of contents in posts
 toc = true
 
+# Date format (Hugo uses Go's reference time: Mon Jan 2 15:04:05 MST 2006)
+date_format = "Jan 2, 2006"
+time_format = "3:04 PM"
+
 # Comments system (uncomment to enable)
 # [comments]
 #   active = "giscus"
