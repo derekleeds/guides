@@ -1,0 +1,10 @@
+## date formats for archives
+[df]
+[df.archives]
+other = "Jan"
+
+[df.archives.strftime]
+other = "Jan"
+
+[df.archives.dayjs]
+other = "Jan"
