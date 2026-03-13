@@ -1,14 +1,13 @@
 ---
 title: "SEL × Cynefin: Security and Autonomy for AI Agents"
 date: 2026-03-13
+lastmod: 2026-03-13
 authors: ["Derek Leeds"]
 categories: [agents, security]
 tags: [openclaw, cynefin, security, autonomy, framework]
 description: "A practical framework for classifying agent capabilities by security level and domain complexity. Know when agents can act autonomously and when they need human approval."
 weight: 20
 ---
-
-# SEL × Cynefin: Security and Autonomy for AI Agents
 
 AI agents need to know two things before acting:
 1. **What tools can I use?** (Security Execution Level)
