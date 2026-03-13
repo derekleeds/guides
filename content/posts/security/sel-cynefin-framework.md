@@ -1,7 +1,7 @@
 ---
 title: "SEL × Cynefin: Security and Autonomy for AI Agents"
 date: 2026-03-13
-author: Derek Leeds
+authors: ["Derek Leeds"]
 categories: [agents, security]
 tags: [openclaw, cynefin, security, autonomy, framework]
 description: "A practical framework for classifying agent capabilities by security level and domain complexity. Know when agents can act autonomously and when they need human approval."
