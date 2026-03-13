@@ -8,6 +8,11 @@ enableGitInfo = true
 defaultContentLanguage = "en"
 defaultContentLanguageInSubdir = false
 
+# Taxonomies (categories and tags)
+[taxonomies]
+  category = "categories"
+  tag = "tags"
+
 # Pagination
 [pagination]
   pagerSize = 10
