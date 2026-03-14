@@ -8,8 +8,6 @@ tags: [openclaw, 1password, credentials, security, tutorial]
 description: "Step-by-step tutorial for setting up 1Password CLI integration with OpenClaw to eliminate plaintext credentials from your agent configuration."
 weight: 20
 ---
-# OpenClaw Secrets Management with 1Password
-
 This guide walks through setting up 1Password as a centralized secret provider for OpenClaw. By the end, every API key, token, and credential in your OpenClaw config will resolve at runtime through 1Password — nothing sensitive stored in plaintext.
 
 ## Prerequisites
