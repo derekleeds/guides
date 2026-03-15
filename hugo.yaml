@@ -1,0 +1,133 @@
+baseURL: https://guides.derekleeds.cloud/
+title: "Derek's Guides"
+
+# Language settings
+contentDir: content/en
+defaultContentLanguage: en
+defaultContentLanguageInSubdir: false
+enableMissingTranslationPlaceholders: true
+enableRobotsTXT: true
+enableGitInfo: true
+
+# Taxonomies
+taxonomies:
+  tag: tags
+  category: categories
+
+# Highlighting
+pygmentsCodeFences: true
+pygmentsUseClasses: false
+pygmentsStyle: tango
+
+# Image processing
+imaging:
+  resampleFilter: CatmullRom
+  quality: 75
+  anchor: smart
+
+# Language configuration
+languages:
+  en:
+    languageName: English
+    title: "Derek's Guides"
+    params:
+      description: "How-to guides for AI agents, homelab infrastructure, and self-hosting"
+
+# Markup settings
+markup:
+  goldmark:
+    parser:
+      attribute:
+        block: true
+    renderer:
+      unsafe: true
+  highlight:
+    style: tango
+    noClasses: false
+  tableOfContents:
+    startLevel: 2
+    endLevel: 4
+
+# Outputs
+outputs:
+  home: [HTML, print, RSS]
+  section: [HTML, print, RSS]
+
+# Site parameters
+params:
+  taxonomy:
+    taxonomyCloud: [tags, categories]
+    taxonomyCloudTitle: [Tags, Categories]
+    taxonomyPageHeader: [tags, categories]
+
+  privacy_policy: https://derekleeds.cloud/privacy
+
+  version_menu: Releases
+  archived_version: false
+  version: "1.0"
+
+  # Repository links
+  github_repo: https://github.com/derekleeds/guides
+  github_branch: main
+
+  # Search (disable for now, can enable Lunr later)
+  offlineSearch: false
+
+  # Disable Google search for now
+  # gcs_engine_id: ""
+
+  # Copyright
+  copyright:
+    authors: "Derek Leeds"
+    from_year: 2026
+
+  # UI settings
+  ui:
+    breadcrumb_disable: false
+    navbar_logo: true
+    navbar_translucent_over_cover_disable: false
+    sidebar_menu_foldable: true
+    sidebar_menu_compact: false
+    sidebar_search_disable: false
+    showLightDarkModeMenu: true
+
+    feedback:
+      enable: false
+
+    readingtime:
+      enable: false
+
+  # Links
+  links:
+    user:
+      - name: GitHub
+        url: https://github.com/derekleeds/guides
+        icon: fab fa-github
+        desc: Source repository
+    developer:
+      - name: Derek Leeds
+        url: https://derekleeds.cloud
+        icon: fa fa-user
+        desc: Personal site
+
+# Menu configuration
+menu:
+  main:
+    - name: "Docs"
+      url: "/docs/"
+      weight: 10
+    - name: "About"
+      url: "/about/"
+      weight: 20
+    - name: "GitHub"
+      url: "https://github.com/derekleeds/guides"
+      weight: 30
+
+# Module imports
+module:
+  hugoVersion:
+    extended: true
+    min: 0.155.0
+  imports:
+    - path: github.com/google/docsy
+      disable: false
