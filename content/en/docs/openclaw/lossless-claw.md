@@ -8,7 +8,7 @@ weight: 10
 description: "A practical guide to installing and configuring Lossless Context Management for OpenClaw - never lose conversation history to compaction again."
 ---
 
-Every LLM has a context window — a maximum number of tokens it can process. When a conversation exceeds this limit, most agents simply truncate older messages. **Lossless Claw** replaces truncation with a DAG-based summarization system that preserves every message while keeping active context within model token limits.
+Every LLM has a context window — a maximum number of tokens it can process. When a conversation exceeds this limit, most agents simply truncate older messages. **Lossless Claw** replaces truncation with a DAG (Directed Acyclic Graph) summarization system that preserves every message while keeping active context within model token limits.
 
 ## What You'll Learn
 

@@ -1,39 +1,46 @@
 ---
-title: About Goldydocs
+title: About
 linkTitle: About
-description: A sample site using the Docsy Hugo theme.
+description: About Derek's Guides - practical documentation for AI agents and homelab infrastructure.
 menu: { main: { weight: 10 } }
 ---
 
 {{% blocks/cover
-  title="About Goldydocs"
+  title="About Derek's Guides"
   height="auto td-below-navbar"
-  image_anchor="bottom"
+  color="primary bg-gradient"
 %}}
-
-<!-- prettier-ignore -->
-{{% _param description %}}
-{.display-6}
 
 {{% /blocks/cover %}}
 
 {{% blocks/lead color="white" %}}
 
-Goldydocs is a sample site using the [Docsy](https://github.com/google/docsy)
-Hugo theme that shows what it can do and provides you with a template site
-structure. It’s designed for you to clone and edit as much as you like. See the
-different sections of the documentation and site for more ideas.
+This site is a collection of practical guides for building AI agents, managing homelab infrastructure, and self-hosting services. Everything here is documented **while I learn** — not after I've mastered it.
 
 {{% /blocks/lead %}}
 
-{{% blocks/section type="row text-center h1" %}}
+{{% blocks/section color="dark" %}}
 
-This is another section with center alignment
+## Why This Exists
+
+I learn by doing. When I figure something out, I write it down. This site is the result — a reference for myself and anyone else working through similar problems.
+
+The focus is on:
+- **OpenClaw** — Agent orchestration, memory systems, and automation
+- **Infrastructure** — Docker, Kubernetes, Proxmox, networking
+- **Security** — Secrets management, hardening, and access control
 
 {{% /blocks/section %}}
 
-{{% blocks/section type="h1" %}}
+{{% blocks/section %}}
 
-This is another section with default alignment
+## About Derek
+
+By day, I'm a Project Manager at a marketing agency, pivoting into technology (SaaS, AI agents). By night, I run a homelab and build OpenClaw.
+
+- **GitHub:** [derekleeds](https://github.com/derekleeds)
+- **Blog:** [journal.derekleeds.cloud](https://journal.derekleeds.cloud)
+- **Guides:** You're here
+- **Email:** contact@derekleeds.com
 
 {{% /blocks/section %}}

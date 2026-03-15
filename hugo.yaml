@@ -1,6 +1,10 @@
 baseURL: https://guides.derekleeds.cloud/
 title: "Derek's Guides"
 
+# Make URLs relative for local preview
+relativeURLs: true
+canonifyURLs: false
+
 # Language settings
 contentDir: content/en
 defaultContentLanguage: en
@@ -60,8 +64,6 @@ params:
     taxonomyCloudTitle: [Tags, Categories]
     taxonomyPageHeader: [tags, categories]
 
-  privacy_policy: https://derekleeds.cloud/privacy
-
   version_menu: Releases
   archived_version: false
   version: "1.0"
@@ -80,6 +82,9 @@ params:
   copyright:
     authors: "Derek Leeds"
     from_year: 2026
+
+  # Privacy policy (local page)
+  privacy_policy: /privacy/
 
   # UI settings
   ui:
