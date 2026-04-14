@@ -353,7 +353,6 @@ result = await hermes.chat(
 - [Hermes Agent Documentation](https://hermes-agent.nousresearch.com/docs/user-guide/features/api-server)
 - [OpenClaw Skills Framework](https://docs.openclaw.ai/tools/skills)
 - [AgentSkills Specification](https://agentskills.io/specification)
-- [Hermes-Clawdia Integration Notes](https://obsidian.derekleeds.cloud/OpenClaw%20%26%20AI%20work/OpenClaw/Hermes-Clawdia%20Integration)
 
 ---
 
