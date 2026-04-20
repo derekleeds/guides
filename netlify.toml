@@ -1,14 +1,11 @@
-# Hugo build configuration for Netlify
-# (https://gohugo.io/hosting-and-deployment/hosting-on-netlify/#configure-hugo-version-in-netlify)
+# Netlify Custom Headers for Agent Readiness
+# https://isitagentready.com
+# RFC 8288 Link headers for agent discovery
 
-[build]
-command = "npm run build:preview"
-publish = "public"
-
-[build.environment]
-GO_VERSION = "1.22.2"
-HUGO_VERSION = "0.155.3"
-NODE_VERSION = "22"
-
-[context.production]
-command = "npm run build:production"
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Link headers for agent discovery (RFC 8288)
+    Link = """</sitemap.xml>; rel="sitemap", </.well-known/api-catalog>; rel="api-catalog", </robots.txt>; rel="robots""""
+    # Content-Type for markdown negotiation
+    Accept-CH = "Sec-CH-UA-Platform-Version"
