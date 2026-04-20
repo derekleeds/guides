@@ -1,6 +1,0 @@
----
-title: "LLMs Documentation Index"
-outputs: ["LLMsTxt"]
----
-
-This file exists to generate the llms.txt documentation index at the site root.
