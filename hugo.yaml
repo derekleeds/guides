@@ -30,7 +30,7 @@ contentDir: content/en
 defaultContentLanguage: en
 defaultContentLanguageInSubdir: false
 enableMissingTranslationPlaceholders: true
-enableRobotsTXT: true
+enableRobotsTXT: false
 enableGitInfo: true
 
 # Taxonomies
