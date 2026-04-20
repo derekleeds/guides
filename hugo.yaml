@@ -1,6 +1,26 @@
 baseURL: https://guides.derekleeds.cloud/
 title: "Derek's Guides"
 
+# Media Types for Agent-Friendly Output
+mediaTypes:
+  text/markdown:
+    suffixes:
+      - md
+
+# Output Formats for Agent-Friendly Content
+outputFormats:
+  Markdown:
+    mediaType: "text/markdown"
+    baseName: "index"
+    isPlainText: true
+    notAlternative: false
+  LLMsTxt:
+    mediaType: "text/plain"
+    baseName: "llms"
+    isPlainText: true
+    notAlternative: true
+    permalinkable: true
+
 # Make URLs relative for local preview
 relativeURLs: true
 canonifyURLs: false
@@ -52,10 +72,11 @@ markup:
     startLevel: 2
     endLevel: 4
 
-# Outputs
+# Outputs - Added Markdown format for agent-friendly access
 outputs:
-  home: [HTML, print, RSS]
-  section: [HTML, print, RSS]
+  home: [HTML, print, RSS, Markdown]
+  section: [HTML, print, RSS, Markdown]
+  page: [HTML, Markdown]
 
 # Site parameters
 params:
@@ -101,6 +122,9 @@ params:
 
     readingtime:
       enable: false
+
+    # Agent-friendly documentation notice
+    agent_friendly_notice: "For AI agents: A documentation index is available at /llms.txt — Markdown versions of all pages are available by appending index.md to any URL path."
 
   # Links
   links:
