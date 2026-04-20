@@ -1,0 +1,40 @@
+# Derek's Guides - Documentation for AI Agents
+
+## Overview
+This is Derek's Guides (https://guides.derekleeds.cloud/), a collection of technical documentation for AI agents, homelab infrastructure, GitOps workflows, and self-hosting.
+
+## Accessing Content
+- **HTML Version**: https://guides.derekleeds.cloud/
+- **Markdown Version**: Append `index.md` to any URL (e.g., https://guides.derekleeds.cloud/docs/openclaw/index.md)
+
+## Documentation Sections
+
+### OpenClaw
+Documentation for the OpenClaw agent platform
+
+- **Getting Started with OpenClaw**: https://guides.derekleeds.cloud/docs/openclaw/getting-started-openclaw/ - A quick introduction to OpenClaw agent orchestration
+- **Lossless Claw**: https://guides.derekleeds.cloud/docs/openclaw/lossless-claw/ - Never Lose Context Again with persistent memory
+- **OpenClaw + Hermes Integration**: https://guides.derekleeds.cloud/docs/openclaw/openclaw-hermes-integration/ - Connect OpenClaw to Hermes Agent
+
+### Infrastructure
+Homelab infrastructure and deployment guides
+
+- **1Password Secrets Management**: https://guides.derekleeds.cloud/docs/security/1password-secrets-management/ - Secure secret management for GitOps
+- **Ollama AMD ROCm**: https://guides.derekleeds.cloud/docs/infrastructure/ollama-amd-rocm-ms-s1-max/ - Run Ollama on AMD GPUs
+
+### Security
+Security frameworks and practices
+
+- **SEL Cynefin Framework**: https://guides.derekleeds.cloud/docs/security/sel-cynefin-framework/ - Security Event Lifecycle framework
+
+## Agent-Specific Access Patterns
+
+| Resource | HTML | Markdown |
+|----------|------|----------|
+| Homepage | / | N/A |
+| Docs Section | /docs/ | /docs/index.md |
+| Individual Page | /docs/SECTION/PAGE/ | /docs/SECTION/PAGE/index.md |
+
+---
+Last updated: April 20, 2026
+Source: https://guides.derekleeds.cloud/
