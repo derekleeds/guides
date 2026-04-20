@@ -74,7 +74,7 @@ markup:
 
 # Outputs - Added Markdown format for agent-friendly access
 outputs:
-  home: [HTML, print, RSS, Markdown]
+  home: [HTML, print, RSS, Markdown, LLMsTxt]
   section: [HTML, print, RSS, Markdown]
   page: [HTML, Markdown]
 
