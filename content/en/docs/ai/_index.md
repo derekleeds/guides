@@ -11,3 +11,5 @@ description:
 
 - [AI, LLMs, ChatGPT, Claude, and Agents: A Practical
   Primer]({{< ref "ai-llms-agents-primer.md" >}})
+- [How to Prompt Without Feeling
+  Weird]({{< ref "how-to-prompt-without-feeling-weird.md" >}})
