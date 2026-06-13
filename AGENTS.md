@@ -1,13 +1,15 @@
 # AGENTS.md - Guides Repository Guide
 
-This file provides context for AI agents working with the `derekleeds/guides` repository (guides.derekleeds.cloud).
+This file provides context for AI agents working with the `derekleeds/guides`
+repository (guides.derekleeds.cloud).
 
 ## Overview
 
-**Purpose:** Technical documentation and guides for OpenClaw, homelab, and DevOps/SecOps topics  
+**Purpose:** Technical documentation and guides for OpenClaw, homelab, and
+DevOps/SecOps topics  
 **URL:** https://guides.derekleeds.cloud  
 **Tech Stack:** Hugo + Docsy theme (Markdown → Static HTML)  
-**Hosting:** Netlify (auto-deploy on push to main)  
+**Hosting:** GitHub Pages (auto-deploy on push to main)  
 **Build Time:** ~2-3 minutes
 
 ## Repository Structure
@@ -35,18 +37,17 @@ All content is Markdown with Hugo frontmatter:
 
 ```yaml
 ---
-title: "Guide Title"
+title: 'Guide Title'
 date: 2026-04-14
-description: "Brief description for SEO and cards"
-author: "Derek Leeds"
+description: 'Brief description for SEO and cards'
+author: 'Derek Leeds'
 categories:
   - Category Name
 tags:
   - tag1
   - tag2
-draft: false  # Set true for drafts
+draft: false # Set true for drafts
 ---
-
 Content in Markdown. Supports Hugo shortcodes, diagrams (Mermaid), and more.
 ```
 
@@ -54,14 +55,15 @@ Content in Markdown. Supports Hugo shortcodes, diagrams (Mermaid), and more.
 
 Content lives in `content/en/docs/<category>/<slug>.md`
 
-URL mapping: `content/en/docs/openclaw/my-guide.md` → `https://guides.derekleeds.cloud/docs/openclaw/my-guide/`
+URL mapping: `content/en/docs/openclaw/my-guide.md` →
+`https://guides.derekleeds.cloud/docs/openclaw/my-guide/`
 
 ## Publishing Workflow
 
 1. **Draft in Obsidian** → `2_Areas/OpenClaw & AI work/Guides Posts/`
 2. **Review and edit** → Technical accuracy, voice alignment
 3. **Move to Hugo format** → `content/en/docs/<category>/<slug>.md`
-4. **Commit and push to main** → Netlify auto-deploys
+4. **Commit and push to main** → GitHub Pages publishes the site
 5. **Live in ~3 minutes**
 
 ### Local Development
@@ -103,10 +105,12 @@ docker-compose up
 ## Technical Details
 
 ### Hugo Version
+
 - Defined in `go.mod`
 - Extended version for SCSS support
 
 ### Docsy Theme
+
 - Version locked in `themes/docsy/`
 - Custom overrides in `layouts/`
 
@@ -129,6 +133,7 @@ hugo --minify
 ```
 
 Check for:
+
 - Broken links (`hugo --minify --verbose`)
 - Missing images
 - Frontmatter errors
@@ -149,7 +154,7 @@ Check for:
 1. Edit the markdown file
 2. Update `Last updated:` date at bottom if significant changes
 3. Commit with descriptive message
-4. Push — Netlify auto-deploys
+4. Push — GitHub Pages publishes the site
 
 ### Add New Category
 
@@ -157,8 +162,8 @@ Check for:
 2. Create `_index.md` for the section:
    ```yaml
    ---
-   title: "Category Name"
-   description: "Section description"
+   title: 'Category Name'
+   description: 'Section description'
    cascade:
      - type: docs
    ---
@@ -167,12 +172,14 @@ Check for:
 
 ### Add Diagrams (Mermaid)
 
-```markdown
+````markdown
 ```mermaid
 graph TD
     A[OpenClaw] -->|HTTP API| B[Hermes]
     B -->|Execute| C[Docker]
 ```
+````
+
 ```
 
 ## Agent Instructions
@@ -187,17 +194,17 @@ When working with this repo:
 6. **Update navigation** — Add new guides to section `_index.md` or config
 7. **Check for broken links** — Run `hugo --minify --verbose` to catch issues
 
-## Netlify Configuration
+## GitHub Pages Publishing
 
-- **Build command:** `hugo --minify`
-- **Publish directory:** `public/`
-- **Branch:** main (auto-deploy)
-- **Environment:** Hugo version set in Netlify UI
+- **Branch:** main
+- **Publish target:** GitHub Pages
+- **Build command:** verify locally with `hugo --minify`
+- **Publish directory:** `public/` when using a generated static artifact
 
 ### Build Logs
 
 If build fails:
-1. Check Netlify deploy log for specific error
+1. Check GitHub Pages build/publish logs for the specific error
 2. Common issues: missing theme submodule, frontmatter syntax, broken shortcodes
 3. Test locally with `hugo --minify --verbose`
 
@@ -239,3 +246,4 @@ For questions or issues, contact Derek Leeds:
 ---
 
 *Last updated: 2026-04-14*
+```
