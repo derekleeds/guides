@@ -13,3 +13,4 @@ description:
   Primer]({{< ref "ai-llms-agents-primer.md" >}})
 - [How to Prompt Without Feeling
   Weird]({{< ref "how-to-prompt-without-feeling-weird.md" >}})
+- [AI Safety for Normal People]({{< ref "ai-safety-for-normal-people.md" >}})
