@@ -15,3 +15,4 @@ description:
   Weird]({{< ref "how-to-prompt-without-feeling-weird.md" >}})
 - [AI Safety for Normal People]({{< ref "ai-safety-for-normal-people.md" >}})
 - [Local AI vs Cloud AI]({{< ref "local-ai-vs-cloud-ai.md" >}})
+- [What AI Agents Actually Are]({{< ref "what-ai-agents-actually-are.md" >}})
