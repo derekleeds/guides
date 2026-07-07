@@ -44,16 +44,11 @@ choose.
 
 <figure>
   <img
-    src="/images/cynefin-framework-2022.jpg"
-    alt="Diagram of the Cynefin framework showing Clear, Complicated, Complex, Chaotic, and Confusion domains"
+    src="/images/cynefin-framework-sketch.webp"
+    alt="Hand-drawn Cynefin framework diagram showing Complex, Complicated, Chaotic, Clear, and Confusion domains"
   />
   <figcaption>
-    Cynefin framework 2022 diagram by
-    <a href="https://commons.wikimedia.org/wiki/File:Cynefin_framework_2022.jpg">Tom at thomasbcox.com</a>,
-    via Wikimedia Commons and the
-    <a href="https://en.wikipedia.org/wiki/Cynefin_framework">Wikipedia Cynefin framework article</a>,
-    licensed under
-    <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.
+    Cynefin framework sketch diagram, provided by Derek Leeds for this guide.
   </figcaption>
 </figure>
 
@@ -364,4 +359,3 @@ process and hoping the process is feeling generous that day.
 - [Enterprise Knowledge: Choosing the Best Project Management Approach for Your Team: The Cynefin Framework](https://enterprise-knowledge.com/choosing-the-best-project-management-approach-for-your-team-the-cynefin-framework/)
 - [The Cynefin Company: The Cynefin Framework](https://thecynefin.co/about-us/about-cynefin-framework/)
 - [Wikipedia: Cynefin framework](https://en.wikipedia.org/wiki/Cynefin_framework)
-- [Wikimedia Commons: Cynefin framework 2022.jpg](https://commons.wikimedia.org/wiki/File:Cynefin_framework_2022.jpg)
