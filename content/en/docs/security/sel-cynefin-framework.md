@@ -1,414 +1,444 @@
 ---
-title: "SEL × Cynefin: Security and Autonomy for AI Agents"
+title: 'Agent Autonomy Gates: SEL × Cynefin for Homelab GitOps'
+linkTitle: 'SEL × Cynefin Autonomy Gates'
 date: 2026-03-13
-lastmod: 2026-03-13
-authors: ["Derek Leeds"]
+lastmod: 2026-07-07
+authors: ['Derek Leeds']
 categories: [agents, security]
-tags: [openclaw, cynefin, security, autonomy, framework]
-description: "A practical framework for classifying agent capabilities by security level and domain complexity. Know when agents can act autonomously and when they need human approval."
+tags:
+  [
+    openclaw,
+    hermes-agent,
+    cynefin,
+    security,
+    autonomy,
+    gitops,
+    homelab,
+    framework,
+  ]
+description:
+  'A practical framework for deciding when AI agents can act autonomously, when
+  they need approval, and when they must stop and escalate in a homelab GitOps
+  environment.'
 weight: 20
 ---
 
-AI agents need to know two things before acting:
-1. **What tools can I use?** (Security Execution Level)
-2. **How autonomous can I be in this domain?** (Cynefin classification)
+AI agents need two answers before they act:
 
-This guide shows you how to implement both, with OpenClaw-specific examples and prompts.
+1. **What kind of state can this action touch?** That is the Security Execution
+   Level, or **SEL**.
+2. **How predictable is the problem domain?** That is the **Cynefin**
+   classification.
 
-## Prerequisites
+The useful policy is the combination:
 
-- OpenClaw installed and configured
-- Basic understanding of AI agents
-- Familiarity with [Cynefin framework](https://en.wikipedia.org/wiki/Cynefin_framework)
+> Agent autonomy = capability risk × domain uncertainty.
 
-## Background
+A read-only action in a clear domain can be autonomous. A destructive action in
+a chaotic domain should stop, preserve evidence, and escalate. The rest lives in
+the middle, where good systems require approval gates instead of vibes.
 
-### The Problem
+> [!note] 2026 status This guide started as an OpenClaw/Agency-era framework for
+> classifying many agent skills. The original idea is still relevant, but the
+> implementation details have changed. Treat this version as a current
+> homelab/GitOps autonomy policy for Hermes, OpenClaw, Forgejo, Komodo, ArgoCD,
+> Talos, and related operations — not as proof that every current skill has
+> enforced SEL metadata.
 
-When you have 150+ agents (like we do after installing Agency), you need answers to:
+## The short version
 
-- Can the `researcher` agent run `docker restart`?
-- Should the `homelab-guardian` agent be able to delete files?
-- Does the `code-crafter` need approval before pushing to GitHub?
-- When should an agent escalate to a human?
+Use **SEL** to classify the action. Use **Cynefin** to classify the situation.
+Then choose the autonomy gate.
 
-The answer isn't binary. It depends on both the **tools** available and the **domain** complexity.
+| Situation                                          | Default agent behavior                                      |
+| -------------------------------------------------- | ----------------------------------------------------------- |
+| Low-risk action + clear domain                     | Execute autonomously and report result                      |
+| Low-risk action + complicated domain               | Analyze autonomously; recommend if state changes are needed |
+| Write or deploy action                             | Prepare change; require approval before mutation            |
+| Destructive or network/security action             | Require explicit approval, rollback path, and verification  |
+| Incident, compromise, data loss, or untrusted code | Contain, preserve evidence, escalate                        |
 
-### Related Reading
+The point is not to slow down every task. The point is to make the risky tasks
+obvious before they turn into archaeology.
 
-- [Domain Classification for Agent Autonomy](https://journal.derekleeds.cloud/domain-classification-agent-autonomy/) — First principles of Cynefin for agents
-- [Security Execution Levels](https://journal.derekleeds.cloud/security-execution-levels/) — How we developed this framework
-- [MCP Bridge paper](https://arxiv.org/abs/2504.08999) — Inspiration for security levels
+## Part 1: Security Execution Levels
 
----
-
-## Part 1: Security Execution Levels (SEL)
-
-SEL defines **what tools** an agent can use:
+Security Execution Levels classify what an action is allowed to touch.
 
 ### SEL-0: Read-only
 
-**Tools:** `read`, `web_fetch`, `web_search`, `memory_search`, `qmd`
+**Meaning:** Inspect, search, summarize, query, and report. No state mutation.
 
-**Use for:** Information gathering agents that should never modify state.
+**Homelab examples:**
 
-**Example agents:** `researcher`, `qa-reviewer`
+- Read Forgejo repositories and diffs.
+- Query Komodo stack status.
+- Query ArgoCD application health.
+- Read logs, metrics, and inventory.
+- Search Obsidian notes.
+- Review a public article or upstream doc.
 
-```yaml
-sel:
-  default: 0
-  sandbox_required: false
-capabilities:
-  allowed_tools: [web_search, web_fetch, memory_search, memory_get]
-  denied_tools: [exec, write, edit, message, gateway]
-```
+**Default gate:** Autonomous.
 
-### SEL-1: Standard
+**Rule:** If the action cannot change state, an agent can usually do it without
+approval. It still needs to cite evidence and say when data is stale or
+unverified.
 
-**Tools:** SEL-0 + `write` (workspace files), `exec` (non-destructive commands)
+### SEL-1: Draft or local non-runtime writes
 
-**Use for:** Agents that create content but shouldn't touch the system.
+**Meaning:** Create or edit non-runtime artifacts that do not immediately affect
+production.
 
-**Example agents:** `communicator`, `librarian`
+**Homelab examples:**
 
-```yaml
-sel:
-  default: 1
-  sandbox_required: false
-capabilities:
-  allowed_tools: [read, write, web_search, web_fetch, memory_*]
-  denied_tools: [exec, edit]  # Edit may include system files
-```
+- Draft an Obsidian plan or runbook.
+- Create a Forgejo branch.
+- Edit a Markdown guide.
+- Draft Helm, Kustomize, Compose, or Komodo TOML changes without deploying.
+- Generate reports, diagrams, or review notes.
 
-### SEL-2: Elevated
+**Default gate:** Autonomous for drafts; human review before promotion.
 
-**Tools:** SEL-1 + `exec` (destructive), `edit` (any file), `gateway` (config changes)
+**Rule:** Agents can create candidate source-of-truth changes, but those changes
+are not real until they are reviewed, committed, and reconciled through the
+proper GitOps path.
 
-**Use for:** Infrastructure agents that need to modify the system.
+### SEL-2: Controlled mutation
 
-**Requires:** `/approve` before destructive operations
+**Meaning:** Change source of truth or trigger a controlled reconciliation.
 
-**Example agents:** `homelab-guardian`, `devops-engineer`
+**Homelab examples:**
 
-```yaml
-sel:
-  default: 1
-  elevated_to: 2
-  elevated_for: [docker_restart, docker_rm, package_install]
-  sandbox_required: false
-```
+- Commit and push to a source-of-truth repository.
+- Merge a Forgejo pull request.
+- Run an ArgoCD sync.
+- Deploy or restart a Komodo-managed stack.
+- Rotate a non-critical token through documented SOPS/1Password flow.
+- Apply a low-risk, pre-reviewed Kubernetes manifest change.
 
-### SEL-3: Quarantine
+**Default gate:** Approval required before mutation.
 
-**Tools:** Arbitrary code execution, untrusted API calls
+**Rule:** The agent should present the diff, expected effect, rollback path, and
+verification command before acting. After approval, it should perform a
+read-after-write verification.
 
-**Use for:** Running untrusted code, processing untrusted input
+### SEL-3: Destructive or high-blast-radius mutation
 
-**Requires:** Per-operation approval + Docker sandbox
+**Meaning:** Delete, revoke, rotate, reconfigure, expose, or patch something
+where failure can cause outage, data loss, lockout, or security exposure.
 
-**Example uses:** Running user-provided scripts, processing unknown files
+**Homelab examples:**
 
-```yaml
-sel:
-  default: 3
-  sandbox_required: true
-capabilities:
-  allowed_tools: [exec_sandbox]  # Only sandboxed execution
-  network:
-    allowed_domains: []
-    denied_domains: ["*"]
-```
+- Delete persistent volumes, datasets, backups, repositories, or stack state.
+- Change UniFi VLANs, DHCP, firewall rules, or routing.
+- Change public DNS, ingress, Cloudflare, Tailscale exposure, or auth boundary.
+- Patch Talos machine configuration.
+- Rotate critical credentials or revoke service access.
+- Enable prune/delete behavior in ArgoCD or Komodo.
+- Run destructive database or filesystem maintenance.
 
----
+**Default gate:** Explicit approval, named target IDs, rollback plan, and
+post-change verification.
 
-## Part 2: Cynefin Domain Classification
+**Rule:** No bulk destructive API calls from inference. Stage read-only first,
+show exact IDs, then wait for approval. If rollback is unknown, say that before
+changing anything.
 
-Cynefin defines **how autonomous** an agent can be in a given domain:
+### SEL-4: Quarantine / incident mode
 
-### Clear Domain
+**Meaning:** The system may be compromised, input may be malicious, or the
+failure mode is unknown enough that normal automation is unsafe.
 
-**Characteristics:** Best practices exist, cause-effect is obvious, predictable outcomes.
+**Homelab examples:**
 
-**Agent behavior:** Autonomous execution
+- Suspicious PR or dependency anomaly.
+- Exposed secret or leaked token.
+- Unknown binary, script, container, or plugin.
+- Possible malware or persistence mechanism.
+- Active data loss, unexpected deletion, or widespread outage.
+- Untrusted code execution request.
 
-**Human role:** Exception handling only
+**Default gate:** Stop normal mutation. Contain, preserve evidence, escalate.
 
-### Complicated Domain
+**Rule:** Do not “clean up” before capturing evidence. Use isolated sandboxes
+for unknown code. Prefer read-only triage until the incident commander approves
+a containment action.
 
-**Characteristics:** Expert analysis needed, multiple valid approaches.
+## Part 2: Cynefin domain classification
 
-**Agent behavior:** Recommend with analysis, wait for approval
+Cynefin classifies how predictable the situation is.
 
-**Human role:** Approve and implement
+### Clear
 
-### Complex Domain
+Cause and effect are obvious. There is a known best practice.
 
-**Characteristics:** Patterns emerge in retrospect, no single right answer.
+**Examples:**
 
-**Agent behavior:** Probabilistic prediction, flag uncertainty
+- Format Markdown.
+- Run a documented build.
+- Check whether a URL returns HTTP 200.
+- Query a known health endpoint.
+- Update a guide index after adding a guide.
 
-**Human role:** Interpret, decide, adjust
+**Agent behavior:** Act autonomously if SEL is low. Report result and evidence.
 
-### Chaotic Domain
+### Complicated
 
-**Characteristics:** Unknown unknowns, no discernible cause-effect.
+Expertise is required. Multiple valid approaches may exist, but analysis can
+identify a good path.
 
-**Agent behavior:** Contain, escalate, document
+**Examples:**
 
-**Human role:** Diagnose, respond, learn
+- Choose between Helm chart options.
+- Review a Renovate PR.
+- Plan a Komodo stack migration.
+- Design SOPS secret handling.
+- Compare ingress/auth options.
 
----
+**Agent behavior:** Analyze and recommend. Prepare source changes when useful.
+Wait for approval before applying mutations.
 
-## Part 3: SEL × Cynefin Matrix
+### Complex
 
-The combination determines agent behavior:
+Patterns emerge over time. There may not be one correct answer yet.
 
-| Cynefin \ SEL | SEL-0 | SEL-1 | SEL-2 | SEL-3 |
-|---------------|-------|-------|-------|-------|
-| **Clear** | ✅ Autonomous | ✅ Autonomous | ⚠️ Approve first | ❌ Escalate |
-| **Complicated** | ✅ Autonomous | ⚠️ Approve | ⚠️ Approve | ❌ Escalate |
-| **Complex** | ✅ Research | ⚠️ Uncertainty | ❌ Human required | ❌ Escalate |
-| **Chaotic** | ✅ Observe | ❌ Escalate | ❌ Escalate | ❌ Full stop |
+**Examples:**
 
-### Decision Logic
+- Intermittent storage latency.
+- Flaky cluster networking.
+- Agent behavior drift.
+- Performance regressions with multiple possible causes.
+- Multi-service migration sequencing.
 
-```
-IF domain is Clear AND tool SEL ≤ 1:
-    → Execute autonomously
+**Agent behavior:** Investigate, propose experiments, document uncertainty, and
+avoid premature destructive fixes. Small reversible probes are better than grand
+unified theories with a flamethrower.
 
-IF domain is Clear AND tool SEL = 2:
-    → Request approval, explain cause-effect, execute on /approve
+### Chaotic
 
-IF domain is Complicated AND tool SEL ≤ 0:
-    → Execute autonomously (research/analysis)
+Cause and effect are unclear and time matters.
 
-IF domain is Complicated AND tool SEL = 1+:
-    → Recommend with analysis, wait for approval
+**Examples:**
+
+- Suspected compromise.
+- Active outage with unknown blast radius.
+- Data loss in progress.
+- Credential leak.
+- Untrusted code attempting execution.
+
+**Agent behavior:** Contain safely, preserve evidence, escalate, and document.
+Normal automation pauses until the situation is stabilized.
+
+## Part 3: The SEL × Cynefin matrix
+
+| Cynefin \ SEL   | SEL-0 read-only             | SEL-1 draft/write    | SEL-2 controlled mutation | SEL-3 destructive/high-risk           | SEL-4 quarantine |
+| --------------- | --------------------------- | -------------------- | ------------------------- | ------------------------------------- | ---------------- |
+| **Clear**       | Autonomous                  | Autonomous           | Approval                  | Explicit approval                     | Escalate         |
+| **Complicated** | Autonomous analysis         | Recommend / draft    | Approval                  | Explicit approval + rollback          | Escalate         |
+| **Complex**     | Research                    | Document uncertainty | Human decision            | Human decision + rollback             | Escalate         |
+| **Chaotic**     | Observe / preserve evidence | Escalate             | Escalate                  | Full stop unless containment approved | Incident mode    |
+
+### Decision logic
+
+```text
+IF domain is Clear AND SEL <= 1:
+  execute autonomously, then report evidence
+
+IF SEL = 2:
+  present diff/target/effect/rollback, wait for approval, then verify
+
+IF SEL = 3:
+  require explicit approval, exact target IDs, rollback plan, and post-checks
+
+IF SEL = 4 OR domain is Chaotic:
+  stop normal automation, preserve evidence, contain only if approved
 
 IF domain is Complex:
-    → Report findings with uncertainty estimates, defer decisions
-
-IF domain is Chaotic:
-    → Immediately escalate, contain if possible, document everything
+  investigate, document uncertainty, propose reversible experiments
 ```
 
----
+## Part 4: Mapping to the current homelab
 
-## Part 4: Implementation in OpenClaw
+### Forgejo
 
-### Step 1: Classify Your Skills
+| Action                                          | SEL   | Gate                                               |
+| ----------------------------------------------- | ----- | -------------------------------------------------- |
+| Read repo, branch, PR, or diff                  | SEL-0 | Autonomous                                         |
+| Create branch or draft file changes             | SEL-1 | Autonomous                                         |
+| Commit and push to branch                       | SEL-2 | Approval when source-of-truth impact is meaningful |
+| Merge to main/source-of-truth branch            | SEL-2 | Approval                                           |
+| Delete repo, branch, release, or protected data | SEL-3 | Explicit approval                                  |
 
-Add `cynefin` and `sel` blocks to each skill's `SKILL.md`:
+Forgejo is source of truth. If the change matters, it should be visible in Git
+before it is reconciled anywhere else.
 
-```yaml
----
-name: homelab-guardian
-description: Infrastructure automation and security for homelab
-cynefin:
-  primary: complicated
-  subdomains:
-    monitoring: clear      # Health checks are predictable
-    management: complicated  # Requires analysis
-    failure_recovery: complex # Emergent patterns
-  rationale: "Infrastructure operations require expertise. Multiple valid approaches exist."
-  autonomous: false
-  human_approval: on_elevation
-  confidence: medium
-sel:
-  default: 1
-  elevated_to: 2
-  elevated_for: [docker_restart, docker_rm, package_install]
-  sandbox_required: false
-capabilities:
-  allowed_tools: [exec, read, write, edit]
-  rate_limits:
-    exec: "1 per 5s"
----
+### Komodo
+
+| Action                                          | SEL   | Gate              |
+| ----------------------------------------------- | ----- | ----------------- |
+| Read stack/server status                        | SEL-0 | Autonomous        |
+| Draft Komodo TOML or Compose changes            | SEL-1 | Autonomous        |
+| Deploy/redeploy/restart a stack                 | SEL-2 | Approval          |
+| Remove stack, volume, server, or secret binding | SEL-3 | Explicit approval |
+
+Komodo manages infrastructure and Compose workloads. Runtime clicks without
+repo-backed intent are pet care. We are trying to stop feeding the pets.
+
+### ArgoCD and Kubernetes
+
+| Action                                    | SEL   | Gate                                    |
+| ----------------------------------------- | ----- | --------------------------------------- |
+| Read app health, events, logs, manifests  | SEL-0 | Autonomous                              |
+| Draft Helm chart or values changes        | SEL-1 | Autonomous                              |
+| Commit app manifest change                | SEL-2 | Approval if it affects runtime          |
+| Sync app                                  | SEL-2 | Approval unless pre-approved automation |
+| Prune/delete resources or persistent data | SEL-3 | Explicit approval                       |
+
+For Kubernetes workloads, prefer Helm-compatible source under the cluster repo.
+ArgoCD enforces the source; agents should not manually patch live objects except
+as an explicitly approved break-glass operation.
+
+### Talos
+
+| Action                        | SEL     | Gate                               |
+| ----------------------------- | ------- | ---------------------------------- |
+| Read machine or cluster state | SEL-0   | Autonomous                         |
+| Draft machine config patch    | SEL-1   | Autonomous                         |
+| Apply machine config patch    | SEL-3   | Explicit approval                  |
+| Reset, wipe, or rebuild node  | SEL-3/4 | Explicit approval or incident mode |
+
+Talos has no SSH and no shell. Treat OS-level changes as machine configuration
+changes, not node tinkering. The cattle are not emotionally attached to
+`/etc/foo.conf`; neither should we be.
+
+### UniFi, DNS, ingress, and Tailscale
+
+| Action                                                | SEL   | Gate              |
+| ----------------------------------------------------- | ----- | ----------------- |
+| Inventory current networks, DNS, routes, ACLs         | SEL-0 | Autonomous        |
+| Draft proposed changes                                | SEL-1 | Autonomous        |
+| Change VLAN, DHCP, firewall, DNS, exposure, or ACLs   | SEL-3 | Explicit approval |
+| Public exposure during incident or unknown auth state | SEL-4 | Incident mode     |
+
+Network changes need a stricter gate because the blast radius is weird. A small
+checkbox can become a Saturday.
+
+### Secrets and credentials
+
+| Action                                                            | SEL     | Gate              |
+| ----------------------------------------------------------------- | ------- | ----------------- |
+| Reference secret paths or env var names                           | SEL-0/1 | Autonomous        |
+| Draft SOPS/1Password wiring                                       | SEL-1   | Autonomous        |
+| Rotate non-critical secret through documented flow                | SEL-2/3 | Approval          |
+| Rotate critical credentials, revoke access, or touch private keys | SEL-3   | Explicit approval |
+| Suspected secret exposure                                         | SEL-4   | Incident mode     |
+
+Never write plaintext secrets into prompts, docs, repos, logs, or workspace
+files. Use 1Password references, SOPS, and environment variable names.
+
+## Part 5: Agent role ceilings
+
+A useful default policy for the homelab agent mesh:
+
+| Role                          | Default ceiling | Notes                                                            |
+| ----------------------------- | --------------- | ---------------------------------------------------------------- |
+| Researcher                    | SEL-0           | Search, read, summarize, compare                                 |
+| Reviewer                      | SEL-0/1         | Inspect diffs and draft findings                                 |
+| Scribe                        | SEL-1           | Write docs, plans, guides, and vault notes                       |
+| Coder                         | SEL-1/2         | Draft code and branches; approval for push/merge when meaningful |
+| Ops                           | SEL-2           | Prepare and execute approved infra changes                       |
+| Security / incident responder | SEL-4           | Triage and containment, but no cleanup before evidence           |
+| Orchestrator                  | SEL-1           | Decompose work and delegate; avoid direct high-risk mutation     |
+
+These are policy ceilings, not personality traits. A clever agent with a delete
+token is still a delete token wearing a hat.
+
+## Part 6: Prompt patterns
+
+### Classify a task
+
+```text
+Classify this task using SEL × Cynefin:
+
+Task: <task>
+Target systems: <Forgejo/Komodo/ArgoCD/Talos/etc.>
+Possible state changes: <none/draft/deploy/delete/network/secrets>
+Known uncertainty: <clear/complicated/complex/chaotic>
+
+Return:
+1. SEL level and rationale
+2. Cynefin domain and rationale
+3. Autonomy decision: autonomous / approval / explicit approval / incident mode
+4. Required evidence before action
+5. Required verification after action
 ```
 
-### Step 2: Define Agent SEL Ceilings
+### Ask for approval on a controlled mutation
 
-In your agent coordination config:
+```text
+Approval requested for SEL-2 action.
 
-```yaml
-agents:
-  researcher:
-    max_SEL: 0  # Can only use SEL-0 tools
-    
-  communicator:
-    max_SEL: 1  # Can use SEL-0 and SEL-1
-    
-  homelab-guardian:
-    max_SEL: 2  # Can use SEL-0, SEL-1, SEL-2 (with approval for SEL-2)
+Target: <exact repo/app/stack/node>
+Change: <summary>
+Source diff: <path or commit>
+Expected effect: <effect>
+Rollback: <rollback path>
+Verification: <post-checks>
+Risk: <known risks>
 ```
 
-### Step 3: Implement Approval Flow
+### Ask for explicit approval on high-risk work
 
-When an agent wants to use an SEL-2 tool:
+```text
+Explicit approval requested for SEL-3 action.
 
-```python
-def check_sel_permission(agent, tool, domain):
-    tool_sel = get_tool_sel(tool)
-    agent_max_sel = agent.max_SEL
-    domain_cynefin = get_domain_classification(domain)
-    
-    # SEL ceiling check
-    if tool_sel > agent_max_sel:
-        return {"action": "deny", "reason": f"Tool requires SEL-{tool_sel}, agent limited to SEL-{agent_max_sel}"}
-    
-    # Cynefin autonomy check
-    if domain_cynefin == "chaotic":
-        return {"action": "escalate", "reason": "Chaotic domain requires human intervention"}
-    
-    if domain_cynefin in ["complex", "complicated"] and tool_sel >= 1:
-        return {"action": "approve", "reason": f"{domain_cynefin} domain needs approval for SEL-{tool_sel}"}
-    
-    if tool_sel >= 2:
-        return {"action": "approve", "reason": f"SEL-{tool_sel} always requires approval"}
-    
-    return {"action": "execute", "reason": "Within bounds"}
+Exact target IDs: <IDs/names>
+Blast radius: <systems/users/data affected>
+Why this is necessary: <reason>
+Non-actions considered: <safer alternatives>
+Rollback/restore plan: <plan>
+Evidence captured: <read-only evidence>
+Post-change verification: <checks>
 ```
 
----
+### Enter incident mode
 
-## Part 5: Prompts for OpenClaw
+```text
+Potential SEL-4 / chaotic-domain event.
 
-### Classifying a New Skill
-
-```
-Classify this skill using the SEL × Cynefin framework:
-
-Skill: [skill name]
-Description: [what it does]
-Tools it uses: [list of tools]
-
-Provide:
-1. SEL level (0-3) with rationale
-2. Cynefin domain (clear/complicated/complex/chaotic) with subdomains
-3. Whether it should be autonomous
-4. When it needs human approval
+Observed indicators: <facts only>
+Systems potentially affected: <scope>
+Immediate safe containment options: <options>
+Evidence to preserve: <logs/snapshots/artifacts>
+Actions explicitly NOT taken: <non-actions>
+Decision needed: <human decision>
 ```
 
-### Checking Agent Permissions
+## Part 7: Practical homelab policy
 
-```
-Can the [agent name] agent use [tool name] for [task]?
+Use these defaults unless a runbook or incident commander says otherwise:
 
-Check:
-1. Agent's max SEL vs tool's required SEL
-2. Task domain Cynefin classification
-3. Decision: autonomous / approve / escalate
+1. **Read-only first.** Gather evidence before proposing mutation.
+2. **Source of truth first.** If a change can be made in Forgejo, draft it
+   there.
+3. **Approval before runtime mutation.** Deploys, syncs, restarts, and merges
+   need a clear gate when they affect running systems.
+4. **Exact IDs before destructive APIs.** No fuzzy deletes.
+5. **Rollback before blast radius.** If rollback is unknown, the risk is higher.
+6. **No plaintext secrets.** Use 1Password references, SOPS, or env var names.
+7. **Incident mode changes the rules.** Preserve evidence before cleanup.
+8. **Document the outcome.** If it is not documented, it did not happen.
 
-Explain your reasoning.
-```
+## Bottom line
 
-### Onboarding New Agents
+SEL × Cynefin is still useful because it prevents the most common agent safety
+mistake: treating all tasks as if they have the same risk.
 
-```
- onboard the [agent name] agent:
+They do not.
 
-1. What is its primary purpose?
-2. What tools does it need?
-3. What domain(s) does it operate in?
-4. Assign SEL ceiling
-5. Classify Cynefin domains
-6. Define capability boundaries
-7. Document escalation paths
-```
+A read-only log query, a Forgejo branch edit, an ArgoCD sync, a Talos machine
+config patch, and an unknown script from the internet are completely different
+risk classes. The agent should know that before it acts.
 
----
-
-## Part 6: Common Patterns
-
-### Pattern: Read-Only Research Agent
-
-```yaml
-# researcher agent
-cynefin:
-  primary: complicated
-  subdomains:
-    search: clear
-    analysis: complicated
-sel:
-  default: 0
-capabilities:
-  allowed_tools: [web_search, web_fetch, memory_search, memory_get]
-  denied_tools: [exec, write, edit, message]
-```
-
-**Behavior:** Can search and analyze autonomously, can't modify anything.
-
-### Pattern: Infrastructure Agent
-
-```yaml
-# homelab-guardian agent
-cynefin:
-  primary: complicated
-  subdomains:
-    monitoring: clear
-    management: complicated
-    recovery: complex
-sel:
-  default: 1
-  elevated_to: 2
-  elevated_for: [docker_restart]
-capabilities:
-  allowed_tools: [exec, read, docker]
-```
-
-**Behavior:** Status checks autonomous, Docker restart needs approval.
-
-### Pattern: Untrusted Code Runner
-
-```yaml
-# code-runner agent
-cynefin:
-  primary: chaotic
-  subdomains:
-    known_code: complicated
-    unknown_code: chaotic
-sel:
-  default: 3
-  sandbox_required: true
-capabilities:
-  allowed_tools: [exec_sandbox]
-  network:
-    denied_domains: ["*"]
-```
-
-**Behavior:** Always sandboxed, requires approval, no network access.
-
----
-
-## Troubleshooting
-
-### "Agent can't use tool it should have access to"
-
-Check:
-1. Agent's `max_SEL` vs tool's required SEL
-2. Domain Cynefin classification (complex domains limit autonomy)
-3. Capability boundary `denied_tools` list
-
-### "Agent is asking for approval when it shouldn't"
-
-Check:
-1. Is the task in a Clear domain?
-2. Is the SEL ≤ 1?
-3. Is the domain classified correctly?
-
-### "How do I elevate temporarily?"
-
-Use `/approve <reason>` in the session. Approval applies to the next elevated operation only.
-
----
-
-## Related Documentation
-
-- `memory/procedural/security-execution-levels.md` — Full SEL framework
-- `memory/procedural/domain-classification.md` — Cynefin classification guide
-- `memory/procedural/agent-onboarding-contract.md` — Agent onboarding process
-- [Journal: Security Execution Levels](https://journal.derekleeds.cloud/security-execution-levels/)
-
----
-
-*This framework was developed while onboarding 154 Agency agents. All 62 skills in our OpenClaw install now have SEL + Cynefin classification.*
+Use SEL to classify the action. Use Cynefin to classify the uncertainty. Then
+choose the right gate.

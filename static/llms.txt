@@ -25,7 +25,7 @@ Homelab infrastructure and deployment guides
 ### Security
 Security frameworks and practices
 
-- **SEL Cynefin Framework**: https://guides.derekleeds.cloud/docs/security/sel-cynefin-framework/ - Security Event Lifecycle framework
+- **SEL × Cynefin Autonomy Gates**: https://guides.derekleeds.cloud/docs/security/sel-cynefin-framework/ - Security Execution Levels and Cynefin framework for AI agent autonomy gates in homelab GitOps operations
 
 ## Agent-Specific Access Patterns
 
