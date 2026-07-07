@@ -16,3 +16,5 @@ description:
 - [AI Safety for Normal People]({{< ref "ai-safety-for-normal-people.md" >}})
 - [Local AI vs Cloud AI]({{< ref "local-ai-vs-cloud-ai.md" >}})
 - [What AI Agents Actually Are]({{< ref "what-ai-agents-actually-are.md" >}})
+- [APIs, MCP, and CLIs: Three Interfaces, Different
+  Jobs]({{< ref "apis-mcp-and-clis.md" >}})
