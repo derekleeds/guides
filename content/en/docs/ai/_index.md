@@ -18,3 +18,5 @@ description:
 - [What AI Agents Actually Are]({{< ref "what-ai-agents-actually-are.md" >}})
 - [APIs, MCP, and CLIs: Three Interfaces, Different
   Jobs]({{< ref "apis-mcp-and-clis.md" >}})
+- [Choosing a Project Management Approach with
+  Cynefin]({{< ref "cynefin-project-management.md" >}})
