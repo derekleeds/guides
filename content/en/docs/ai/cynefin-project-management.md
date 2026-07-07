@@ -49,7 +49,7 @@ choose.
   />
   <figcaption>
     Cynefin framework 2022 diagram by
-    <a href="https://commons.wikimedia.org/wiki/File:Cynefin_framework_2022.jpg">Tom@thomasbcox.com</a>,
+    <a href="https://commons.wikimedia.org/wiki/File:Cynefin_framework_2022.jpg">Tom at thomasbcox.com</a>,
     via Wikimedia Commons and the
     <a href="https://en.wikipedia.org/wiki/Cynefin_framework">Wikipedia Cynefin framework article</a>,
     licensed under
