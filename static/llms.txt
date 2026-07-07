@@ -25,6 +25,7 @@ Plain-English guides for AI, agents, and practical team workflows
 ### Infrastructure
 Homelab infrastructure and deployment guides
 
+- **Architectural Decisions**: https://guides.derekleeds.cloud/docs/infrastructure/architectural-decisions/ - Practical guide to ADRs, decision logs, templates, and GitOps/homelab decision governance
 - **1Password Secrets Management**: https://guides.derekleeds.cloud/docs/security/1password-secrets-management/ - Secure secret management for GitOps
 - **Ollama AMD ROCm**: https://guides.derekleeds.cloud/docs/infrastructure/ollama-amd-rocm-ms-s1-max/ - Run Ollama on AMD GPUs
 
