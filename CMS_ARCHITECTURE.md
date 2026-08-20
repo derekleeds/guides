@@ -46,7 +46,7 @@ Starlight provides documentation features without maintaining custom equivalents
 
 The migration copies the existing English guide corpus into the Starlight content collection, converts Hugo section indexes and shortcodes, retains static assets and the custom domain, and replaces the active Hugo deployment with an Astro build on Cloudflare Pages.
 
-The old Hugo, Docsy, Go, Docker, and Netlify implementation is moved to `archive/hugo-docsy/` after the Astro build reproduces the established routes. It is outside every active build path. Remove that archive only after the post-launch observation window, Search Console review, and rollback decision.
+The old Hugo, Docsy, Go, Docker, and Netlify implementation was removed after the Astro build reproduced the established routes and the rollback decision was made. Git history retains the recovery path.
 
 The URL, shortcode, and sidebar inventories are stored under `migration/`. No redirects are required because all established routes are preserved.
 
