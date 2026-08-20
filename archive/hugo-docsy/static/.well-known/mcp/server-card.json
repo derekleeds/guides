@@ -1,0 +1,20 @@
+{
+  "$schema": "https://github.com/cloudflare/agent-skills-discovery-rfc/blob/main/schemas/mcp-server-card-v1.json",
+  "serverInfo": {
+    "name": "OpenClaw Guides",
+    "version": "1.0.0",
+    "description": "Technical documentation and guides for the OpenClaw AI agent system and homelab"
+  },
+  "transport": {
+    "type": "sse",
+    "url": "https://guides.derekleeds.cloud/.well-known/mcp/sse"
+  },
+  "capabilities": {
+    "resources": {
+      "listChanged": true
+    },
+    "tools": {
+      "listChanged": true
+    }
+  }
+}

@@ -1,0 +1,64 @@
+---
+title: "AI agent orchestration, memory, and MCP guides"
+description: "Practical guides to agent orchestration, memory architecture, MCP tooling, homelab infrastructure, and self-hosting."
+template: splash
+hero:
+  title: "Build AI agents you can understand and maintain"
+  tagline: "Learn how agents coordinate work, preserve useful context, and connect to real systems through MCP, APIs, and command-line tools."
+  actions:
+    - text: Browse all guides
+      link: /docs/
+      icon: right-arrow
+      variant: primary
+    - text: View the source
+      link: https://github.com/derekleeds/guides
+      icon: external
+---
+
+import { CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+## Pick a starting point
+
+The site is organized around problems, not product names. Start with the topic
+closest to the system you are trying to build or troubleshoot.
+
+<CardGrid>
+  <LinkCard
+    title="Agent orchestration"
+    description="Understand what an agent runtime coordinates, where skills and tools fit, and when multiple agents help."
+    href="/docs/openclaw/"
+  />
+  <LinkCard
+    title="Memory architecture"
+    description="Separate live context from durable notes, searchable indexes, and lossless conversation history."
+    href="/docs/memory-management/"
+  />
+  <LinkCard
+    title="MCP tooling"
+    description="Learn how Model Context Protocol servers expose tools and context, and when an API or CLI is the better interface."
+    href="/docs/ai/apis-mcp-and-clis/"
+  />
+  <LinkCard
+    title="Infrastructure and security"
+    description="Apply the same ideas to homelab services, secrets, deployment decisions, and safe automation."
+    href="/docs/infrastructure/"
+  />
+</CardGrid>
+
+## Terms you will see here
+
+- **OpenClaw** is an agent runtime and gateway. It connects models to workspaces,
+  tools, skills, sessions, and communication channels.
+- **LCM**, short for Lossless Context Management, is the approach used by the
+  Lossless Claw plugin to compact long conversations without discarding the
+  underlying messages.
+- **QMD**, short for Query Markup Documents, is a local search engine for
+  Markdown and other text collections. It combines keyword search, vector
+  search, and reranking, and it can expose search through MCP.
+- **MCP**, the Model Context Protocol, is a standard connection between an AI
+  application and servers that expose tools, resources, or prompts.
+
+Each guide defines specialized terms again where they matter. You should not
+need prior experience with a specific agent framework to follow the architecture.
+Use the [agent systems glossary](/docs/ai/agent-systems-glossary/) when you need
+a definition without the full implementation guide.

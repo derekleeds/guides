@@ -1,0 +1,60 @@
+---
+const { head, entry } = Astro.locals.starlightRoute;
+const siteUrl = "https://guides.derekleeds.cloud";
+const pageUrl = new URL(Astro.url.pathname, siteUrl).href;
+const imageUrl = `${siteUrl}/og-image.png`;
+const personId = "https://derekleeds.com/#person";
+const websiteId = `${siteUrl}/#website`;
+const { data } = entry;
+
+const graph: Record<string, unknown>[] = [
+  {
+    "@type": "Person",
+    "@id": personId,
+    name: "Derek Leeds",
+    url: "https://derekleeds.com/",
+    sameAs: ["https://github.com/derekleeds"],
+  },
+  {
+    "@type": "WebSite",
+    "@id": websiteId,
+    name: "Derek's Guides",
+    url: `${siteUrl}/`,
+    description:
+      "Practical guides to agent orchestration, memory architecture, MCP tooling, homelab infrastructure, and self-hosting.",
+    author: { "@id": personId },
+  },
+];
+
+if (data.date instanceof Date) {
+  const modifiedDate =
+    data.lastUpdated instanceof Date ? data.lastUpdated : data.date;
+  graph.push({
+    "@type": "TechArticle",
+    "@id": `${pageUrl}#article`,
+    headline: data.title,
+    description: data.description,
+    url: pageUrl,
+    mainEntityOfPage: pageUrl,
+    image: imageUrl,
+    datePublished: data.date.toISOString(),
+    dateModified: modifiedDate.toISOString(),
+    author: { "@id": personId },
+    publisher: { "@id": personId },
+    isPartOf: { "@id": websiteId },
+    ...(data.tags?.length ? { keywords: data.tags.join(", ") } : {}),
+  });
+}
+
+const schema = {
+  "@context": "https://schema.org",
+  "@graph": graph,
+};
+---
+
+{
+  head.map(({ tag: Tag, attrs, content }) => (
+    <Tag {...attrs} set:html={content} />
+  ))
+}
+<script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />

@@ -1,0 +1,27 @@
+# Derek's Guides
+
+Practical technical guides about AI agent orchestration, memory architecture, MCP tooling, homelab infrastructure, and security.
+
+Site: https://guides.derekleeds.cloud/
+Markdown source: https://github.com/derekleeds/guides/tree/main/src/content/docs
+
+## Start here
+
+- Agent orchestration: https://guides.derekleeds.cloud/docs/openclaw/getting-started-openclaw/
+- Agent memory architecture: https://guides.derekleeds.cloud/docs/memory-management/
+- APIs, MCP, and CLIs: https://guides.derekleeds.cloud/docs/ai/apis-mcp-and-clis/
+- Agent systems glossary: https://guides.derekleeds.cloud/docs/ai/agent-systems-glossary/
+
+## OpenClaw and conversation history
+
+- OpenClaw section: https://guides.derekleeds.cloud/docs/openclaw/
+- Lossless Context Management: https://guides.derekleeds.cloud/docs/openclaw/lossless-claw/
+- OpenClaw and Hermes integration: https://guides.derekleeds.cloud/docs/openclaw/openclaw-hermes-integration/
+
+## Infrastructure and security
+
+- Infrastructure section: https://guides.derekleeds.cloud/docs/infrastructure/
+- Security section: https://guides.derekleeds.cloud/docs/security/
+- Architectural decisions: https://guides.derekleeds.cloud/docs/infrastructure/architectural-decisions/
+
+Last reviewed: 2026-08-19
