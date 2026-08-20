@@ -1,0 +1,2 @@
+# Conventional sitemap alias for crawlers that request /sitemap.xml.
+/sitemap.xml /sitemap-index.xml 301

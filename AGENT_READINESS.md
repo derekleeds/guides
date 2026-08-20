@@ -4,7 +4,8 @@ The public discovery files live in `public/` and are copied into the root of the
 
 ## Published files
 
-- `/robots.txt` declares crawler access and points to the sitemap index.
+- `/robots.txt` declares general crawler access and points to the sitemap index. Cloudflare Managed robots.txt adds the zone-level AI training policy at the edge.
+- `/sitemap.xml` redirects to Astro's generated `/sitemap-index.xml` for crawlers that assume the conventional filename.
 - `/llms.txt` gives agents a concise topic and URL index.
 - `/.well-known/api-catalog` describes API discovery links.
 - `/.well-known/agent-skills/index.json` describes available skills metadata.
@@ -18,6 +19,6 @@ The production site publishes HTML, not a parallel `index.md` URL for every page
 
 After deployment, request each file directly and confirm it returns the expected content type. Also verify the generated sitemap index and representative guide URLs.
 
-GitHub Pages does not apply the old Netlify header configuration. Any future response-header or content-negotiation requirement needs an explicit edge or hosting implementation rather than a documentation-only claim.
+Cloudflare Pages does not apply the old Netlify header configuration. Any future response-header or content-negotiation requirement needs an explicit Cloudflare edge or Pages implementation rather than a documentation-only claim.
 
-Last reviewed: 2026-08-19
+Last reviewed: 2026-08-20
