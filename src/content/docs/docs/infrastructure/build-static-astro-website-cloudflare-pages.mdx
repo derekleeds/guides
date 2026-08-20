@@ -10,6 +10,8 @@ tags: [astro, cloudflare-pages, static-site, web-development]
 weight: 25
 ---
 
+import { FileTree } from "@astrojs/starlight/components";
+
 Astro is a good fit for content-focused websites that should produce ordinary HTML, load quickly, and remain easy to deploy. This guide builds the smallest useful Astro site, explains the repository structure, adds typed Markdown content, and prepares the output for Cloudflare Pages.
 
 The finished path is:
@@ -84,38 +86,39 @@ Astro reserves `src/pages/` for routes. Most other directory names are conventio
 
 Use this structure until the site proves it needs more:
 
-```text
-my-site/
-├── public/
-│   ├── favicon.svg
-│   └── robots.txt
-├── src/
-│   ├── assets/
-│   │   └── hero.jpg
-│   ├── components/
-│   │   ├── Header.astro
-│   │   └── Footer.astro
-│   ├── content/
-│   │   └── posts/
-│   │       └── hello-world.md
-│   ├── layouts/
-│   │   ├── BaseLayout.astro
-│   │   └── PostLayout.astro
-│   ├── pages/
-│   │   ├── posts/
-│   │   │   ├── index.astro
-│   │   │   └── [id].astro
-│   │   ├── 404.astro
-│   │   ├── about.astro
-│   │   └── index.astro
-│   ├── styles/
-│   │   └── global.css
-│   └── content.config.ts
-├── astro.config.mjs
-├── package.json
-├── pnpm-lock.yaml
-└── tsconfig.json
-```
+<FileTree>
+
+- public/
+  - favicon.svg
+  - robots.txt
+- src/
+  - assets/
+    - hero.jpg
+  - components/
+    - Header.astro
+    - Footer.astro
+  - content/
+    - posts/
+      - hello-world.md
+  - layouts/
+    - BaseLayout.astro
+    - PostLayout.astro
+  - pages/
+    - posts/
+      - index.astro
+      - `[id].astro`
+    - 404.astro
+    - about.astro
+    - index.astro
+  - styles/
+    - global.css
+  - content.config.ts
+- astro.config.mjs
+- package.json
+- pnpm-lock.yaml
+- tsconfig.json
+
+</FileTree>
 
 The boundaries are simple:
 
