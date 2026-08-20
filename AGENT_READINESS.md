@@ -1,55 +1,23 @@
-# Cloudflare Agent Readiness Implementation Summary
+# Agent discovery files
 
-## Files Added/Modified
+The public discovery files live in `public/` and are copied into the root of the built site.
 
-### 1. robots.txt (New)
-- **Location:** `/robots.txt`
-- **Features:**
-  - Standard User-agent: * rules
-  - AI bot rules (GPTBot, OAI-SearchBot, Claude-Web, Google-Extended, anthropic-ai)
-  - Content-Signal for AI training preferences
-  - Sitemap reference
+## Published files
 
-### 2. .well-known/api-catalog (New)
-- **Location:** `/.well-known/api-catalog`
-- **Content:** Linkset JSON per RFC 9727
-- **Purpose:** API discovery for agents
+- `/robots.txt` declares crawler access and points to the sitemap index.
+- `/llms.txt` gives agents a concise topic and URL index.
+- `/.well-known/api-catalog` describes API discovery links.
+- `/.well-known/agent-skills/index.json` describes available skills metadata.
+- `/.well-known/mcp/server-card.json` describes MCP discovery metadata.
 
-### 3. .well-known/agent-skills/index.json (New)
-- **Location:** `/.well-known/agent-skills/index.json`
-- **Content:** Agent skills discovery index per Agent Skills Discovery RFC v0.2.0
-- **Purpose:** Discovery of agent skills and capabilities
+## Source access
 
-### 4. .well-known/mcp/server-card.json (New)
-- **Location:** `/.well-known/mcp/server-card.json`
-- **Content:** MCP Server Card per SEP-1649
-- **Purpose:** MCP server discovery for AI agents
+The production site publishes HTML, not a parallel `index.md` URL for every page. Canonical Markdown is available in the public GitHub repository under `src/content/docs/`.
 
-### 5. netlify.toml (Modified)
-- **Added:** Link response headers (RFC 8288)
-- **Headers:** sitemap, api-catalog, robots
+## Verification
 
-## Testing
+After deployment, request each file directly and confirm it returns the expected content type. Also verify the generated sitemap index and representative guide URLs.
 
-After deployment, verify:
+GitHub Pages does not apply the old Netlify header configuration. Any future response-header or content-negotiation requirement needs an explicit edge or hosting implementation rather than a documentation-only claim.
 
-1. `curl -I https://guides.derekleeds.cloud/` - Check Link headers
-2. `curl https://guides.derekleeds.cloud/robots.txt` - Verify robots.txt
-3. `curl https://guides.derekleeds.cloud/.well-known/api-catalog` - Verify JSON response
-4. `curl https://guides.derekleeds.cloud/.well-known/agent-skills/index.json` - Verify JSON
-5. `curl https://guides.derekleeds.cloud/.well-known/mcp/server-card.json` - Verify JSON
-
-## Remaining Issues
-
-### Markdown for Agents
-This site uses Hugo/Docsy which doesn't natively support Content Negotiation for Markdown.
-Options:
-1. Use Cloudflare Workers to intercept Accept: text/markdown headers
-2. Create a separate markdown version at /index.md
-3. Document this as a known limitation
-
-### WebMCP
-WebMCP requires JavaScript implementation on each page. Consider adding to base layout template if desired.
-
----
-Last updated: 2026-04-20
+Last reviewed: 2026-08-19

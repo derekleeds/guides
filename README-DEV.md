@@ -1,113 +1,53 @@
-# Development Workflow
+# Development workflow
 
-This document describes the GitOps workflow for contributing to the guides.
+## Start a change
 
-## Quick Start
+Create a feature branch from the current production branch. This repository uses `codex/` for Codex-created branches.
 
-```bash
-# Clone the repo
-git clone https://forgejo.tailbd8f6.ts.net/homelab/guides.git
-cd guides
+## Edit content
 
-# Start local development server
-npm install
-npm run serve
-```
+Choose either workflow:
 
-Open http://localhost:1313 to preview.
+- Edit Markdown in `src/content/docs/`.
+- Run `pnpm dev` and use the local editor at `/keystatic`.
 
-## Branch Strategy
+Keystatic is a local editing interface, not a second content store. Its changes appear as normal Markdown changes in Git.
 
-- `main` - Production (requires PR to merge)
-- `dev` - Staging (requires PR to merge from feature branches)
-- `feature/*` - Feature branches (create from dev)
-
-## Workflow
-
-### 1. Create Feature Branch
+## Preview and validate
 
 ```bash
-git checkout dev
-git pull
-git checkout -b feature/my-topic
+pnpm dev
+pnpm build
+pnpm format:check
 ```
 
-### 2. Make Changes
+The production check validates Astro and TypeScript before building all pages. Review navigation, code blocks, internal links, mobile layout, and any changed images in a browser.
 
-Edit files in `content/en/docs/`:
-- Create new `.md` files for new guides
-- Update existing guides
-- Add images to `assets/`
+## Add a guide
 
-### 3. Preview Locally
+1. Choose the appropriate directory under `src/content/docs/docs/`.
+2. Create a Markdown file with a stable, lowercase slug.
+3. Add a descriptive title and a search-focused description.
+4. Define unfamiliar terms in the opening section.
+5. Link to the relevant section overview and related guides.
+6. Run the production checks.
 
-```bash
-npm run serve
+Example frontmatter:
+
+```yaml
+---
+title: "Guide title"
+description: "A specific description of the question this guide answers."
+date: 2026-08-19
+lastmod: 2026-08-19
+authors: ["Derek Leeds"]
+---
 ```
 
-Open http://localhost:1313 to verify changes.
+## Preserve URLs
 
-### 4. Commit and Push
+The Astro migration keeps the established `/docs/...` paths. Do not rename a content file or section directory without adding and testing a redirect.
 
-```bash
-git add -A
-git commit -m "Add guide for X"
-git push origin feature/my-topic
-```
+## Publish
 
-### 5. Create Pull Request
-
-1. Go to https://forgejo.tailbd8f6.ts.net/homelab/guides
-2. Click "Compare & Pull Request"
-3. Set: `feature/my-topic` → `dev`
-4. Describe changes
-5. Submit PR
-
-### 6. Merge to Production (After Testing)
-
-Once changes are verified on staging:
-
-1. Create PR: `dev` → `main`
-2. Review and merge
-3. Production deploys automatically
-
-## Directory Structure
-
-```
-guides-docsy/
-├── content/en/
-│   ├── about/           # About page
-│   ├── docs/            # Documentation
-│   │   ├── infrastructure/
-│   │   ├── memory-management/
-│   │   ├── openclaw/
-│   │   └── security/
-│   └── privacy/         # Privacy policy
-├── assets/              # Images, SCSS
-├── layouts/             # Custom layouts
-└── hugo.yaml            # Hugo config
-```
-
-## Adding a New Guide
-
-1. Create `content/en/docs/<section>/<topic>.md`
-2. Add front matter:
-   ```yaml
-   ---
-   title: "Guide Title"
-   linkTitle: "Short Title"
-   weight: 10
-   description: "Brief description"
-   date: 2026-03-15
-   ---
-   ```
-3. Write content in Markdown
-4. Preview, commit, PR
-
-## Build Commands
-
-| Command | Purpose |
-|---------|---------|
-| `npm run serve` | Local dev server (live reload) |
-| `npm run build:production` | Production build |
-| `npm run build:preview` | Preview build |
+After review, merge the approved change to `main`. GitHub Actions builds and deploys the site to GitHub Pages. Confirm the workflow passes and spot-check the changed production URLs.

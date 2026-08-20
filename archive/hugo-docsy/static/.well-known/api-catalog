@@ -1,0 +1,34 @@
+{
+  "linkset": [
+    {
+      "anchor": "https://guides.derekleeds.cloud",
+      "service-doc": [
+        {
+          "href": "https://guides.derekleeds.cloud/about/",
+          "type": "text/markdown",
+          "title": "About OpenClaw Guides"
+        }
+      ]
+    },
+    {
+      "anchor": "https://guides.derekleeds.cloud/docs/openclaw/",
+      "service-doc": [
+        {
+          "href": "https://guides.derekleeds.cloud/docs/openclaw/",
+          "type": "text/html",
+          "title": "OpenClaw Documentation"
+        }
+      ]
+    },
+    {
+      "anchor": "https://guides.derekleeds.cloud/docs/homelab/",
+      "service-doc": [
+        {
+          "href": "https://guides.derekleeds.cloud/docs/homelab/",
+          "type": "text/html",
+          "title": "Homelab Infrastructure Guides"
+        }
+      ]
+    }
+  ]
+}

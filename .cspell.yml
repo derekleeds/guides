@@ -1,10 +1,15 @@
-version: '0.2'
+version: "0.2"
 caseSensitive: true
 words:
-  - chalin
-  - docset
-  - Docsy
-  - errorf
-  - gohugoio
-  - Goldydocs
-  - pageinfo
+  - Astro
+  - Cynefin
+  - Hermes
+  - Keystatic
+  - LCM
+  - llms
+  - MCP
+  - OpenClaw
+  - Pagefind
+  - pnpm
+  - QMD
+  - Starlight

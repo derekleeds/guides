@@ -1,0 +1,31 @@
+old_path,new_path,status,notes
+/,/,preserved,Astro splash homepage
+/about/,/about/,preserved,Starlight content page
+/docs/,/docs/,preserved,Guide index
+/docs/ai/,/docs/ai/,preserved,Section overview
+,/docs/ai/agent-systems-glossary/,new,Plain-language concepts and jargon entry point
+/docs/ai/ai-llms-agents-primer/,/docs/ai/ai-llms-agents-primer/,preserved,
+/docs/ai/ai-safety-for-normal-people/,/docs/ai/ai-safety-for-normal-people/,preserved,
+/docs/ai/apis-mcp-and-clis/,/docs/ai/apis-mcp-and-clis/,preserved,
+/docs/ai/cynefin-project-management/,/docs/ai/cynefin-project-management/,preserved,
+/docs/ai/how-to-prompt-without-feeling-weird/,/docs/ai/how-to-prompt-without-feeling-weird/,preserved,
+/docs/ai/local-ai-vs-cloud-ai/,/docs/ai/local-ai-vs-cloud-ai/,preserved,
+/docs/ai/what-ai-agents-actually-are/,/docs/ai/what-ai-agents-actually-are/,preserved,
+/docs/hermes/,/docs/hermes/,preserved,Section overview
+/docs/hermes/getting-started-hermes-agent/,/docs/hermes/getting-started-hermes-agent/,preserved,
+/docs/hermes/hermes-agent-architecture/,/docs/hermes/hermes-agent-architecture/,preserved,
+/docs/hermes/hermes-gitops-sre-assistant/,/docs/hermes/hermes-gitops-sre-assistant/,preserved,
+/docs/hermes/hermes-skills-memory-context/,/docs/hermes/hermes-skills-memory-context/,preserved,
+/docs/infrastructure/,/docs/infrastructure/,preserved,Section overview
+/docs/infrastructure/architectural-decisions/,/docs/infrastructure/architectural-decisions/,preserved,
+/docs/infrastructure/ollama-amd-rocm-ms-s1-max/,/docs/infrastructure/ollama-amd-rocm-ms-s1-max/,preserved,
+/docs/memory-management/,/docs/memory-management/,preserved,Expanded memory architecture guide
+/docs/openclaw/,/docs/openclaw/,preserved,Section overview
+/docs/openclaw/getting-started-openclaw/,/docs/openclaw/getting-started-openclaw/,preserved,Expanded agent orchestration guide
+/docs/openclaw/guardrails-skill/,/docs/openclaw/guardrails-skill/,preserved,
+/docs/openclaw/lossless-claw/,/docs/openclaw/lossless-claw/,preserved,Rewritten LCM guide
+/docs/openclaw/openclaw-hermes-integration/,/docs/openclaw/openclaw-hermes-integration/,preserved,
+/docs/security/,/docs/security/,preserved,Section overview
+/docs/security/1password-secrets-management/,/docs/security/1password-secrets-management/,preserved,
+/docs/security/sel-cynefin-framework/,/docs/security/sel-cynefin-framework/,preserved,
+/privacy/,/privacy/,preserved,Updated for current static hosting behavior

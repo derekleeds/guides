@@ -1,46 +1,19 @@
-# How to Contribute
+# Contributing
 
-We'd love to accept your patches and contributions to this project. There are
-just a few small guidelines you need to follow.
+Contributions should improve the accuracy, clarity, or maintainability of Derek's Guides.
 
-## Contributor License Agreement
+## Content changes
 
-Contributions to this project must be accompanied by a Contributor License
-Agreement. You (or your employer) retain the copyright to your contribution;
-this simply gives us permission to use and redistribute your contributions as
-part of the project. Head over to <https://cla.developers.google.com/> to see
-your current agreements on file or to sign a new one.
+1. Edit the relevant Markdown file under `src/content/docs/`.
+2. Define unfamiliar terms and link to primary documentation for changing technical details.
+3. Preserve the existing file path unless the change includes a tested redirect.
+4. Run `pnpm build` and `pnpm format:check`.
+5. Open a GitHub pull request that describes the reader problem and the proposed change.
 
-You generally only need to submit a CLA once, so if you've already submitted one
-(even if it was for a different project), you probably don't need to do it
-again.
+The optional local editor is available at `/keystatic` after running `pnpm dev`. It writes to the same Markdown files.
 
-## Code reviews
+## Code changes
 
-All submissions, including submissions by project members, require review. We
-use GitHub pull requests for this purpose. Consult
-[GitHub Help](https://help.github.com/articles/about-pull-requests/) for more
-information on using pull requests.
+Keep the Guides and Learn sites separate. Changes to Astro, Starlight, Keystatic, navigation, or deployment should remain scoped to this repository and preserve the `guides.derekleeds.cloud` domain.
 
-## Community Guidelines
-
-This project follows
-[Google's Open Source Community Guidelines](https://opensource.google.com/conduct/).
-
-## Maintainer notes
-
-### Upgrade Docsy
-
-Update Docsy to the latest tagged release:
-
-```bash
-npm run update:docsy:mod
-```
-
-Or update to the latest commit on the main branch:
-
-```bash
-npm run update:docsy:main
-```
-
-<!-- cSpell:ignore hugo docsy -->
+Include local validation results in the pull request. Do not include generated `dist/` or `.astro/` files.
