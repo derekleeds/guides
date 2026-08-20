@@ -9,7 +9,7 @@ description: "Privacy policy for Derek's Guides website."
 
 ### Information We Collect
 
-This website is a static documentation site published with GitHub Pages. It
+This website is a static documentation site published with Cloudflare Pages. It
 has no accounts, forms, comments, or analytics. The site owner does not collect,
 store, or process personal information through the site.
 
@@ -21,8 +21,8 @@ browser storage and is not sent to the site owner.
 
 ### Third-Party Services
 
-- **GitHub Pages** — Publishes this website from the source repository. See
-  [GitHub's Privacy Statement](https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement)
+- **Cloudflare Pages** — Builds and publishes this website from the source repository. See
+  [Cloudflare's Privacy Policy](https://www.cloudflare.com/privacypolicy/)
 
 ### External Links
 

@@ -2,7 +2,7 @@
 
 [guides.derekleeds.cloud](https://guides.derekleeds.cloud/) is a standalone technical guide site about AI agents, agent memory, MCP tooling, homelab infrastructure, and security.
 
-The site uses Astro 7, Starlight, Markdown content, and a local Keystatic editor. GitHub Pages publishes the production build.
+The site uses Astro 7, Starlight, Markdown content, and a local Keystatic editor. Cloudflare Pages publishes the production build.
 
 ## Local development
 
@@ -45,9 +45,7 @@ Keep existing slugs stable. Use absolute site paths for internal links, such as 
 
 ## Publishing
 
-A push to `main` runs the GitHub Pages workflow in `.github/workflows/deploy.yml`. The workflow installs dependencies, validates the content, builds the static site, and deploys the generated artifact.
-
-The custom domain is retained through `public/CNAME`.
+A push to `main` triggers Cloudflare Pages to install dependencies, run `pnpm build`, and publish the generated `dist/` directory. Cloudflare manages the `guides.derekleeds.cloud` custom domain.
 
 ## Architecture
 

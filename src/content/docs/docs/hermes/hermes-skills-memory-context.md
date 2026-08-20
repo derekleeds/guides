@@ -72,7 +72,7 @@ yourself.
 
 Good examples:
 
-- The guides site is GitHub Pages-backed.
+- The guides site is Cloudflare Pages-backed.
 - The Obsidian vault path is `/home/derekleeds/obsidian/derekleedscloud`.
 - The user prefers concise, validation-backed answers.
 

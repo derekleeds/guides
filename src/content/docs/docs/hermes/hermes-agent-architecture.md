@@ -91,13 +91,13 @@ Hermes follow?"
 Examples:
 
 - Deploying a Komodo-managed Docker Compose stack.
-- Publishing a guide to a Hugo/GitHub Pages site.
+- Publishing a guide to an Astro/Cloudflare Pages site.
 - Reindexing the Obsidian search service.
 - Running a Kubernetes migration assessment.
 
 Skills prevent rediscovering the same footguns every week, which is nice because
 there are only so many times a person should have to learn that a service is
-GitHub Pages-backed and not Netlify-backed.
+Cloudflare Pages-backed and not GitHub Pages-backed.
 
 ## Memory
 
@@ -114,7 +114,7 @@ Fixed PR #123 today.
 Good memory:
 
 ```text
-The guides site is hosted by GitHub Pages and mirrored into the Obsidian vault.
+The guides site is hosted by Cloudflare Pages and mirrored into the Obsidian vault.
 ```
 
 For project notes, runbooks, incident records, and plans, use Obsidian. For code

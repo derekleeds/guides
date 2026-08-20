@@ -9,7 +9,7 @@ This repository publishes [guides.derekleeds.cloud](https://guides.derekleeds.cl
 - Markdown content collections
 - Local Keystatic editor
 - pnpm 11.19.0
-- GitHub Pages
+- Cloudflare Pages
 
 ## Content locations
 

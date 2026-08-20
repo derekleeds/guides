@@ -6,7 +6,7 @@
 
 ## Decision
 
-Keep `guides.derekleeds.cloud` and `learn.derekleeds.cloud` as separate sites. Guides remains in the `derekleeds/guides` repository, keeps its existing domain and `/docs/...` URLs, and continues to publish through GitHub Pages.
+Keep `guides.derekleeds.cloud` and `learn.derekleeds.cloud` as separate sites. Guides remains in the `derekleeds/guides` repository, keeps its existing domain and `/docs/...` URLs, and publishes through Cloudflare Pages.
 
 Use this stack for Guides:
 
@@ -15,9 +15,9 @@ Use this stack for Guides:
 - Markdown files in Git as the canonical content;
 - Keystatic in local mode as an optional editing interface;
 - pnpm for JavaScript dependencies and reproducible builds;
-- GitHub Actions and GitHub Pages for deployment.
+- Cloudflare Pages Git integration for builds and deployment.
 
-The hosting authority remains GitHub Pages. The Vault plan proposed Cloudflare Pages but also flagged the existing GitHub Pages record as a decision gate. No configured Cloudflare Pages project or preview target was available during this migration, while the current GitHub Pages deployment was verified. A hosting move can be evaluated later as a separate change; it is not required to remove Hugo from the active stack.
+Cloudflare Pages is the hosting authority. Its Git integration watches the `main` branch, runs `pnpm build`, and publishes `dist/`. Cloudflare also manages the `guides.derekleeds.cloud` custom domain. GitHub remains the source repository but no longer builds or hosts the production site.
 
 ## Why
 
@@ -44,7 +44,7 @@ Starlight provides documentation features without maintaining custom equivalents
 
 ## Migration
 
-The migration copies the existing English guide corpus into the Starlight content collection, converts Hugo section indexes and shortcodes, retains static assets and the custom domain, and replaces the active Hugo deployment with an Astro GitHub Pages workflow.
+The migration copies the existing English guide corpus into the Starlight content collection, converts Hugo section indexes and shortcodes, retains static assets and the custom domain, and replaces the active Hugo deployment with an Astro build on Cloudflare Pages.
 
 The old Hugo, Docsy, Go, Docker, and Netlify implementation is moved to `archive/hugo-docsy/` after the Astro build reproduces the established routes. It is outside every active build path. Remove that archive only after the post-launch observation window, Search Console review, and rollback decision.
 
@@ -58,10 +58,10 @@ Before deployment:
 2. Confirm every established guide URL has a generated page.
 3. Test the homepage, section navigation, local search, and representative guides.
 4. Test the local Keystatic editor and confirm it reads the Markdown collections.
-5. Confirm `CNAME`, robots rules, sitemap, Pagefind, social metadata, JSON-LD, and GitHub Pages workflow output.
+5. Confirm the Cloudflare Pages build, custom domain, robots rules, sitemap, Pagefind, social metadata, and JSON-LD.
 
-After deployment, spot-check the same URLs on `https://guides.derekleeds.cloud` and verify that Learn is unchanged. The branch has been validated locally; a remote preview and production cutover remain deployment gates until this branch is pushed.
+After deployment, spot-check the same URLs on `https://guides.derekleeds.cloud` and verify that Learn is unchanged. Cloudflare's production deployment and custom-domain checks are the final launch gates.
 
 ## Revisit when
 
-Reconsider the decision if the two sites develop substantial duplicated content, the local editor no longer fits the publishing workflow, a hosted editorial workflow becomes a requirement, or a configured Cloudflare Pages project offers a clear operational advantage. A future review must start from the separation decision rather than assuming that a shared Astro stack implies consolidation.
+Reconsider the decision if the two sites develop substantial duplicated content, the local editor no longer fits the publishing workflow, or a hosted editorial workflow becomes a requirement. A future review must start from the separation decision rather than assuming that a shared Astro stack implies consolidation.

@@ -1,6 +1,6 @@
 # Archived Hugo and Docsy implementation
 
-This directory preserves the pre-migration Hugo 0.155.3 and Docsy source as a rollback aid. Nothing under this directory is part of the Astro build, the GitHub Pages workflow, dependency updates, or the active authoring process.
+This directory preserves the pre-migration Hugo 0.155.3 and Docsy source as a rollback aid. Nothing under this directory is part of the Astro build, the Cloudflare Pages deployment, dependency updates, or the active authoring process.
 
 Do not maintain both implementations. Make content changes in `src/content/docs/` and configuration changes in the Astro files at the repository root.
 
