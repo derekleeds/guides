@@ -10,7 +10,7 @@ tags: [forgejo, github, cloudflare-pages, gitops, repository-mirroring]
 weight: 20
 ---
 
-import { Steps } from "@astrojs/starlight/components";
+import { Aside, Steps } from "@astrojs/starlight/components";
 
 You can keep a website's canonical repository in a self-hosted Forgejo instance without replacing Cloudflare Pages' GitHub integration.
 
@@ -37,7 +37,11 @@ Use this workflow when:
 - You want humans and automation to commit through Forgejo.
 - You do not want to maintain custom deployment code just to remove GitHub from the build trigger.
 
+<Aside type="danger">
+
 Do not use it if you need both Forgejo and GitHub to accept independent writes. Forgejo push mirrors can force-update the destination. Two writable forges create a conflict problem, not redundancy.
+
+</Aside>
 
 ## The operating rule
 
@@ -49,7 +53,11 @@ For this guide:
 Write in Forgejo. Mirror to GitHub. Build in Cloudflare Pages.
 ```
 
+<Aside type="danger">
+
 After cutover, do not commit directly to GitHub. If an emergency GitHub change is unavoidable, pause the push mirror, import the commit into Forgejo, verify the two repositories match, and then resume the mirror.
+
+</Aside>
 
 ## What you need
 
@@ -106,6 +114,8 @@ Treat GitHub as canonical during a short migration window:
 
 </Steps>
 
+<Aside type="danger">
+
 If the Forgejo repository already exists and contains different history, stop before overwriting it. Preserve the old Forgejo head under a recovery branch such as:
 
 ```text
@@ -113,6 +123,8 @@ archive/pre-github-import-YYYY-MM-DD
 ```
 
 Then reconcile the histories deliberately. Do not solve divergence with an unexplained force push.
+
+</Aside>
 
 ### Verify the baseline
 
@@ -123,7 +135,11 @@ git ls-remote https://forgejo.example.com/OWNER/REPO.git refs/heads/main
 git ls-remote https://github.com/OWNER/REPO.git refs/heads/main
 ```
 
+<Aside type="danger">
+
 Use a credential helper or interactive prompt for private repositories. Never place a token directly in the URL because URLs leak into shell history, logs, process listings, and screenshots.
+
+</Aside>
 
 ## Step 2: create a repository-scoped GitHub token
 
@@ -155,7 +171,11 @@ GitHub recommends fine-grained personal access tokens when they support the requ
 
 </Steps>
 
+<Aside type="danger">
+
 Do not grant Actions, Administration, Pages, Webhooks, or organization permissions for a normal Cloudflare Pages site mirror.
+
+</Aside>
 
 If the repository contains GitHub Actions workflow files and Forgejo must update `.github/workflows/*`, GitHub may require **Workflows: Read and write**. Add that permission only when the repository actually needs it. Cloudflare Pages' Git integration does not require a GitHub Actions workflow.
 
@@ -191,7 +211,11 @@ In the Forgejo source repository:
 
 </Steps>
 
+<Aside type="danger">
+
 Forgejo stores the mirror credential for runtime use. Do not also save the credential in repository files, CI variables that do not need it, or documentation.
+
+</Aside>
 
 ### Choose the branch filter carefully
 
@@ -239,7 +263,11 @@ The build command and output directory depend on the website. For example, many 
 
 ## Step 5: validate the complete path
 
+<Aside type="danger">
+
 Do not call the workflow complete because the settings page accepted the token. Prove each layer.
+
+</Aside>
 
 <Steps>
 
@@ -340,7 +368,11 @@ If somebody commits directly to GitHub after cutover:
 
 </Steps>
 
+<Aside type="danger">
+
 Do not allow the next forced mirror push to erase an emergency fix before it reaches the canonical repository.
+
+</Aside>
 
 ## Troubleshooting
 
