@@ -1,0 +1,567 @@
+---
+title: "Build a Static Astro Website for Cloudflare Pages"
+linkTitle: "Static Astro on Cloudflare Pages"
+description: "Build a small static Astro website with shared layouts, typed Markdown content, optimized images, and a reproducible Cloudflare Pages deployment."
+date: 2026-08-20
+lastUpdated: 2026-08-20
+authors: ["Derek Leeds"]
+categories: [infrastructure, web-development]
+tags: [astro, cloudflare-pages, static-site, web-development]
+weight: 25
+---
+
+Astro is a good fit for content-focused websites that should produce ordinary HTML, load quickly, and remain easy to deploy. This guide builds the smallest useful Astro site, explains the repository structure, adds typed Markdown content, and prepares the output for Cloudflare Pages.
+
+The finished path is:
+
+```text
+Astro source → static build → dist/ → Cloudflare Pages
+```
+
+This guide focuses on the website itself. For the repository publishing path from Forgejo through GitHub to Cloudflare Pages, use [the one-way publishing workflow](/docs/infrastructure/forgejo-github-cloudflare-pages-one-way-publishing/).
+
+## What you will build
+
+A static site with:
+
+- file-based pages,
+- one shared layout,
+- reusable components,
+- global CSS,
+- optimized local images,
+- a typed Markdown content collection,
+- a production build in `dist/`.
+
+No UI framework, CMS, database, or server adapter is added. Add those only when the site has a requirement that plain Astro cannot satisfy.
+
+## Prerequisites
+
+You need:
+
+- Node.js `22.12.0` or newer; Astro does not support odd-numbered Node.js releases,[1]
+- Git,
+- a package manager,
+- a text editor,
+- a Forgejo or other Git repository for the finished project.
+
+This guide uses `pnpm`. Substitute the equivalent `npm` commands if that is already your standard.
+
+Check the tools:
+
+```bash
+node --version
+pnpm --version
+git --version
+```
+
+## 1. Create the Astro project
+
+Astro's official `create astro` wizard is the shortest supported path to a new project.[1]
+
+```bash
+pnpm create astro@latest my-site
+cd my-site
+```
+
+Choose:
+
+- **Template:** Empty
+- **TypeScript:** Strict
+- **Install dependencies:** Yes
+- **Initialize Git:** No if you will push into an existing Forgejo repository; otherwise either answer is fine
+
+Start the development server:
+
+```bash
+pnpm dev
+```
+
+Open the local URL printed by Astro, usually `http://localhost:4321`.
+
+## 2. Understand the repository
+
+Astro reserves `src/pages/` for routes. Most other directory names are conventions that you can keep, rename, or omit.[2][3]
+
+Use this structure until the site proves it needs more:
+
+```text
+my-site/
+├── public/
+│   ├── favicon.svg
+│   └── robots.txt
+├── src/
+│   ├── assets/
+│   │   └── hero.jpg
+│   ├── components/
+│   │   ├── Header.astro
+│   │   └── Footer.astro
+│   ├── content/
+│   │   └── posts/
+│   │       └── hello-world.md
+│   ├── layouts/
+│   │   ├── BaseLayout.astro
+│   │   └── PostLayout.astro
+│   ├── pages/
+│   │   ├── posts/
+│   │   │   ├── index.astro
+│   │   │   └── [id].astro
+│   │   ├── 404.astro
+│   │   ├── about.astro
+│   │   └── index.astro
+│   ├── styles/
+│   │   └── global.css
+│   └── content.config.ts
+├── astro.config.mjs
+├── package.json
+├── pnpm-lock.yaml
+└── tsconfig.json
+```
+
+The boundaries are simple:
+
+| Path               | Purpose                                  |
+| ------------------ | ---------------------------------------- |
+| `src/pages/`       | URL routes; filenames become paths       |
+| `src/layouts/`     | Shared page shells                       |
+| `src/components/`  | Reusable page fragments                  |
+| `src/content/`     | Markdown or other structured content     |
+| `src/assets/`      | Images Astro should process and optimize |
+| `src/styles/`      | CSS imported by layouts or components    |
+| `public/`          | Files copied unchanged to the final site |
+| `astro.config.mjs` | Astro and integration configuration      |
+
+Keep authored CSS and JavaScript in `src/`. Use `public/` for files that must retain their exact filename or must bypass processing, such as `robots.txt` and a favicon.[2]
+
+## 3. Create the shared layout
+
+A layout is an Astro component that provides reusable page structure and a `<slot />` for page-specific content.[4]
+
+Create `src/layouts/BaseLayout.astro`:
+
+```astro
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = 'A website built with Astro.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <Header />
+    <main>
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
+```
+
+Create `src/components/Header.astro`:
+
+```astro
+<header>
+  <a href="/">My Site</a>
+  <nav aria-label="Primary navigation">
+    <a href="/about/">About</a>
+    <a href="/posts/">Posts</a>
+  </nav>
+</header>
+```
+
+Create `src/components/Footer.astro`:
+
+```astro
+<footer>
+  <p>&copy; {new Date().getFullYear()} My Site</p>
+</footer>
+```
+
+The navigation uses normal HTML links. Astro does not require a client-side router for a static site.
+
+## 4. Add global CSS
+
+Create `src/styles/global.css`:
+
+```css
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+body {
+  margin: 0;
+}
+
+header,
+main,
+footer {
+  width: min(70rem, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 1rem;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+}
+
+main {
+  min-height: 70vh;
+  padding-block: 3rem;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+```
+
+This is enough to establish readable defaults. Add a design system when the site has enough repeated visual decisions to justify one, not before.
+
+## 5. Add pages
+
+Files in `src/pages/` create routes from their file paths.[3]
+
+Create `src/pages/index.astro`:
+
+```astro
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="My Site"
+  description="A small, fast website built with Astro."
+>
+  <h1>Welcome</h1>
+  <p>This site is built as static HTML and deployed on Cloudflare Pages.</p>
+</BaseLayout>
+```
+
+Create `src/pages/about.astro`:
+
+```astro
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="About | My Site">
+  <h1>About</h1>
+  <p>Replace this with the reason your site exists.</p>
+</BaseLayout>
+```
+
+Create `src/pages/404.astro`:
+
+```astro
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Page not found | My Site">
+  <h1>Page not found</h1>
+  <p><a href="/">Return home</a>.</p>
+</BaseLayout>
+```
+
+Astro builds `src/pages/404.astro` as `404.html`, which most static hosts recognize as the custom not-found page.[3]
+
+## 6. Handle images deliberately
+
+Put local images in `src/assets/` when Astro should optimize them. Put them in `public/` only when they must be copied without processing.[6]
+
+```astro
+---
+import { Image } from 'astro:assets';
+import hero from '../assets/hero.jpg';
+---
+
+<Image
+  src={hero}
+  alt="Describe the meaningful content of the image"
+  widths={[640, 960, 1280]}
+  sizes="(max-width: 48rem) 100vw, 70rem"
+/>
+```
+
+Always provide useful alternative text for meaningful images. Use `alt=""` for images that are purely decorative.
+
+## 7. Add typed Markdown content
+
+Use a content collection when several entries share the same structure. Astro collections can validate frontmatter and provide typed query and rendering APIs.[5]
+
+Create `src/content.config.ts`:
+
+```ts
+import { defineCollection } from "astro:content";
+import { glob } from "astro/loaders";
+import { z } from "astro/zod";
+
+const posts = defineCollection({
+  loader: glob({ base: "./src/content/posts", pattern: "**/*.{md,mdx}" }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    published: z.coerce.date(),
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { posts };
+```
+
+Create `src/content/posts/hello-world.md`:
+
+```markdown
+---
+title: Hello, world
+description: The first post on the site.
+published: 2026-08-20
+draft: false
+---
+
+This post is stored as Markdown and validated during the build.
+```
+
+Create `src/layouts/PostLayout.astro`:
+
+```astro
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  published: Date;
+}
+
+const { title, description, published } = Astro.props;
+---
+
+<BaseLayout title={`${title} | My Site`} description={description}>
+  <article>
+    <h1>{title}</h1>
+    <p><time datetime={published.toISOString()}>{published.toLocaleDateString()}</time></p>
+    <slot />
+  </article>
+</BaseLayout>
+```
+
+Create `src/pages/posts/index.astro`:
+
+```astro
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const posts = (await getCollection('posts', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.published.valueOf() - a.data.published.valueOf());
+---
+
+<BaseLayout title="Posts | My Site">
+  <h1>Posts</h1>
+  <ul>
+    {posts.map((post) => (
+      <li><a href={`/posts/${post.id}/`}>{post.data.title}</a></li>
+    ))}
+  </ul>
+</BaseLayout>
+```
+
+Create `src/pages/posts/[id].astro`:
+
+```astro
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import PostLayout from '../../layouts/PostLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts', ({ data }) => !data.draft);
+
+  return posts.map((post) => ({
+    params: { id: post.id },
+    props: { post },
+  }));
+}
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<PostLayout {...post.data}>
+  <Content />
+</PostLayout>
+```
+
+The schema catches missing or malformed metadata during development and build instead of allowing broken content to reach production.
+
+## 8. Set the site URL
+
+Set the production URL in `astro.config.mjs`:
+
+```js
+import { defineConfig } from "astro/config";
+
+export default defineConfig({
+  site: "https://example.com",
+});
+```
+
+Replace `https://example.com` with the final canonical origin. The `site` value supports canonical URLs, sitemap integrations, and other features that need the deployed origin.
+
+Do not install the Cloudflare adapter for a static site. The default Astro build already produces static files. Add an adapter only if the site later requires on-demand rendering or Cloudflare runtime APIs.
+
+## 9. Validate the site locally
+
+Run Astro's built-in checks and production build:
+
+```bash
+pnpm astro check
+pnpm build
+pnpm preview
+```
+
+If `astro check` reports that its checker packages are missing, accept Astro's prompt to install them or add them explicitly:
+
+```bash
+pnpm add -D @astrojs/check typescript
+```
+
+Verify:
+
+- `/` loads,
+- `/about/` loads,
+- `/posts/` lists the sample post,
+- `/posts/hello-world/` renders it,
+- an unknown path uses the 404 page,
+- the browser console has no errors,
+- `pnpm build` creates `dist/`.
+
+Commit the lockfile. It is part of the reproducible build input.
+
+## 10. Push the repository
+
+Create the destination repository in Forgejo, then push the project:
+
+```bash
+git init
+git add .
+git commit -m "feat: create Astro site"
+git branch -M main
+git remote add origin https://forgejo.example.com/OWNER/REPOSITORY.git
+git push -u origin main
+```
+
+Do not place deployment tokens, API keys, or `.env` values in Git. Commit an `.env.example` containing variable names and harmless examples only if the site actually requires environment variables.
+
+## 11. Configure Cloudflare Pages
+
+For the one-way Forgejo publishing model, first configure the Forgejo-to-GitHub push mirror described in the companion guide. Then connect that GitHub deployment repository to Cloudflare Pages.
+
+Cloudflare's Astro Pages guide uses these values for a static Astro project:[7]
+
+| Setting                | Value        |
+| ---------------------- | ------------ |
+| Production branch      | `main`       |
+| Build command          | `pnpm build` |
+| Build output directory | `dist`       |
+
+Cloudflare's example uses `npm run build`; `pnpm build` is the equivalent when the repository contains `pnpm-lock.yaml`.
+
+Cloudflare now recommends Workers for new projects, while its Pages documentation remains applicable to existing Pages deployments.[8] This tutorial intentionally targets the established Git-connected Pages workflow. If you are starting without that constraint, compare Workers static assets before choosing the deployment product.
+
+## 12. Prove the complete publishing path
+
+Make one harmless change in the canonical Forgejo repository and verify each hop:
+
+```text
+Forgejo main commit
+  = GitHub main commit
+  = Cloudflare Pages deployed commit
+```
+
+Then verify the public site:
+
+- the expected page is live,
+- the title and metadata are correct,
+- assets load,
+- the custom domain uses HTTPS,
+- the Pages deployment reports the same commit.
+
+A green local build proves the repository can build. It does not prove that the mirror, Cloudflare integration, domain, or public deployment works.
+
+## Keep the project boring
+
+Start with Astro components and native HTML. Add client-side JavaScript only to the component that needs it. Add React, Vue, a CMS, server rendering, or a database only when a real requirement appears.
+
+A small static site generally needs:
+
+```text
+pages + layouts + components + content + CSS
+```
+
+That structure is enough for portfolios, documentation, small blogs, resumes, and service websites. The framework can grow later; there is no prize for making it grow on day one.
+
+## Troubleshooting
+
+| Symptom                                              | Check                                                                                         |
+| ---------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Cloudflare builds but serves a blank or missing site | Build output directory must be `dist`                                                         |
+| A page returns 404                                   | Confirm the file is under `src/pages/` and inspect its file-derived route                     |
+| A post is missing                                    | Check `draft`, collection path, glob pattern, and frontmatter schema                          |
+| Build fails on content metadata                      | Fix the entry to match `src/content.config.ts`; do not weaken the schema without reason       |
+| Images bypass optimization                           | Move processable images from `public/` to `src/assets/` and import them                       |
+| Local build succeeds but Cloudflare fails            | Compare Node and package-manager versions and ensure the lockfile is committed                |
+| Server APIs are unavailable                          | A static build has no server runtime; decide whether on-demand rendering is actually required |
+
+## Next steps
+
+After the baseline works, useful additions may include:
+
+- an XML sitemap,
+- RSS for posts,
+- canonical URL and social metadata,
+- redirect and security-header files,
+- automated link checking,
+- preview deployments for selected branches.
+
+Add each as a separate, verified change. A starter site is not improved by becoming a museum of integrations.
+
+## Sources
+
+[1] https://docs.astro.build/en/install-and-setup — Astro: Install Astro
+[2] https://docs.astro.build/en/basics/project-structure — Astro: Project structure
+[3] https://docs.astro.build/en/basics/astro-pages — Astro: Pages
+[4] https://docs.astro.build/en/basics/layouts — Astro: Layouts
+[5] https://docs.astro.build/en/guides/content-collections — Astro: Content collections
+[6] https://docs.astro.build/en/guides/images — Astro: Images
+[7] https://developers.cloudflare.com/pages/framework-guides/deploy-an-astro-site — Cloudflare Pages: Astro
+[8] https://docs.astro.build/en/guides/deploy/cloudflare — Astro: Deploy to Cloudflare

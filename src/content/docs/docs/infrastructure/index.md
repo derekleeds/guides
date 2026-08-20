@@ -9,4 +9,6 @@ sidebar:
 ---
 
 - [Documenting architecture decisions and their rationale](/docs/infrastructure/architectural-decisions/)
+- [Publishing from Forgejo through GitHub to Cloudflare Pages](/docs/infrastructure/forgejo-github-cloudflare-pages-one-way-publishing/)
+- [Building a static Astro website for Cloudflare Pages](/docs/infrastructure/build-static-astro-website-cloudflare-pages/)
 - [Running Ollama on the AMD Ryzen AI Max+ 395](/docs/infrastructure/ollama-amd-rocm-ms-s1-max/)

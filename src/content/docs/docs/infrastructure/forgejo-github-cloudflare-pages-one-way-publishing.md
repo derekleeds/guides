@@ -1,0 +1,316 @@
+---
+title: "Forgejo to GitHub to Cloudflare Pages: A One-Way Publishing Workflow"
+linkTitle: "Forgejo to GitHub Publishing"
+description: "Keep Forgejo canonical while using a main-only GitHub push mirror to trigger an existing Cloudflare Pages deployment."
+date: 2026-08-20
+lastUpdated: 2026-08-20
+authors: ["Derek Leeds"]
+categories: [infrastructure, gitops]
+tags: [forgejo, github, cloudflare-pages, gitops, repository-mirroring]
+weight: 20
+---
+
+You can keep a website's canonical repository in a self-hosted Forgejo instance without replacing Cloudflare Pages' GitHub integration.
+
+The pattern is:
+
+```text
+Developer or authorized agent
+  → Forgejo canonical repository
+  → Forgejo push mirror
+  → GitHub deployment repository
+  → Cloudflare Pages
+```
+
+Forgejo owns the source. GitHub is a deployment relay. Cloudflare Pages watches the GitHub production branch and builds the site when Forgejo pushes a new commit.
+
+This guide covers the repository and deployment workflow. To build the website itself, use [Build a Static Astro Website for Cloudflare Pages](/docs/infrastructure/build-static-astro-website-cloudflare-pages/).
+
+## When this pattern fits
+
+Use this workflow when:
+
+- Forgejo is your preferred source of truth.
+- Cloudflare Pages already builds reliably from GitHub.
+- You want humans and automation to commit through Forgejo.
+- You do not want to maintain custom deployment code just to remove GitHub from the build trigger.
+
+Do not use it if you need both Forgejo and GitHub to accept independent writes. Forgejo push mirrors can force-update the destination. Two writable forges create a conflict problem, not redundancy.
+
+## The operating rule
+
+Decide which forge is canonical before configuring anything.
+
+For this guide:
+
+```text
+Write in Forgejo. Mirror to GitHub. Build in Cloudflare Pages.
+```
+
+After cutover, do not commit directly to GitHub. If an emergency GitHub change is unavoidable, pause the push mirror, import the commit into Forgejo, verify the two repositories match, and then resume the mirror.
+
+## What you need
+
+- A working Forgejo instance and permission to manage the source repository.
+- A GitHub account that can create or write to the destination repository.
+- A Cloudflare account with access to Workers & Pages.
+- A website that builds from a Git repository.
+- A known production branch, usually `main`.
+- A password manager or secret store for the GitHub credential.
+
+This guide uses HTTPS and a GitHub fine-grained personal access token. Forgejo also supports SSH push mirrors, but token-based HTTPS is easier to scope to one repository and matches the workflow described here.
+
+## Step 1: align Forgejo and GitHub before enabling the mirror
+
+A push mirror is not a merge service. The destination must be empty or already contain the history you intend Forgejo to publish.
+
+### For a new website
+
+1. Create the project in Forgejo.
+2. Push the initial branch to Forgejo.
+3. Create an empty GitHub repository.
+4. Do not initialize the GitHub repository with a README, license, or `.gitignore` if those files already exist in Forgejo.
+
+The empty GitHub repository is ready to receive the first mirror push.
+
+### For an existing GitHub website
+
+Treat GitHub as canonical during a short migration window:
+
+1. Freeze writes to the GitHub repository.
+2. Record the default branch, visibility, branches, tags, and current production commit ID.
+3. In Forgejo, open **Create...** > **New Migration**.
+4. Select GitHub or the generic Git service.
+5. Enter the GitHub repository URL and authentication if the repository is private.
+6. Do **not** select **This repository will be a mirror**. The goal is a one-time import followed by a normal Forgejo repository.
+7. Complete the migration.
+8. Compare the Forgejo and GitHub production branch commit IDs.
+
+If the Forgejo repository already exists and contains different history, stop before overwriting it. Preserve the old Forgejo head under a recovery branch such as:
+
+```text
+archive/pre-github-import-YYYY-MM-DD
+```
+
+Then reconcile the histories deliberately. Do not solve divergence with an unexplained force push.
+
+### Verify the baseline
+
+The production branch must resolve to the same commit on both forges before the push mirror is enabled.
+
+```bash
+git ls-remote https://forgejo.example.com/OWNER/REPO.git refs/heads/main
+git ls-remote https://github.com/OWNER/REPO.git refs/heads/main
+```
+
+Use a credential helper or interactive prompt for private repositories. Never place a token directly in the URL because URLs leak into shell history, logs, process listings, and screenshots.
+
+## Step 2: create a repository-scoped GitHub token
+
+GitHub recommends fine-grained personal access tokens when they support the required operation. A fine-grained token can be restricted to one resource owner, selected repositories, and specific permissions.
+
+1. In GitHub, open your profile menu and select **Settings**.
+2. Select **Developer settings**.
+3. Under **Personal access tokens**, select **Fine-grained tokens**.
+4. Select **Generate new token**.
+5. Give the token a descriptive name, such as `forgejo-push-example-site`.
+6. Set an expiration date that matches your rotation process.
+7. Select the GitHub user or organization under **Resource owner**.
+8. Under **Repository access**, choose **Only select repositories**.
+9. Select only the destination repository.
+10. Under **Repository permissions**, set **Contents** to **Read and write**.
+11. Generate the token and store it immediately in your password manager or secret store.
+
+Do not grant Actions, Administration, Pages, Webhooks, or organization permissions for a normal Cloudflare Pages site mirror.
+
+If the repository contains GitHub Actions workflow files and Forgejo must update `.github/workflows/*`, GitHub may require **Workflows: Read and write**. Add that permission only when the repository actually needs it. Cloudflare Pages' Git integration does not require a GitHub Actions workflow.
+
+For a small number of repositories, one token per repository keeps failures and compromise scope separate. GitHub recommends considering a GitHub App for long-lived integrations or larger-scale automation. A GitHub App is useful when token count or lifecycle management becomes a real problem, not merely because it exists.
+
+## Step 3: add the Forgejo push mirror
+
+In the Forgejo source repository:
+
+1. Open **Settings** > **Repository**.
+2. Find **Mirror Settings**.
+3. Enter the GitHub repository URL:
+
+   ```text
+   https://github.com/GITHUB_OWNER/GITHUB_REPOSITORY.git
+   ```
+
+4. Set **Branch Filter** to `main` for a production-only publishing path.
+5. Expand **Authorization**.
+6. Enter your GitHub username as **Username**.
+7. Enter the fine-grained token as **Password**.
+8. Enable **Sync when new commits are pushed**.
+9. Select **Add Push Mirror**.
+
+Forgejo stores the mirror credential for runtime use. Do not also save the credential in repository files, CI variables that do not need it, or documentation.
+
+### Choose the branch filter carefully
+
+Forgejo's documentation states that an empty branch filter uses `git push --mirror`. That can force-update remote refs and overwrite changes made directly in GitHub.
+
+Use the narrowest filter that supports your deployment model:
+
+| Branch filter     | Result                                           |
+| ----------------- | ------------------------------------------------ |
+| `main`            | Pushes only the production branch                |
+| `main, feature/*` | Pushes production plus matching preview branches |
+| Empty             | Mirrors all refs with force-mirror behavior      |
+
+For a simple Cloudflare Pages production workflow, `main` is the safer default. Add preview branches only if you use Cloudflare preview deployments and have a naming convention worth preserving.
+
+## Step 4: connect GitHub to Cloudflare Pages
+
+If the GitHub repository already deploys through Cloudflare Pages, verify the existing settings and move to the next step.
+
+For a new Pages project:
+
+1. In the Cloudflare dashboard, open **Workers & Pages**.
+2. Create a Pages project and choose the Git integration option.
+3. Authorize the **Cloudflare Workers & Pages** GitHub App.
+4. Limit the GitHub App to **Only select repositories** and select the destination repository.
+5. Choose the repository in Cloudflare Pages.
+6. Set the production branch to `main`.
+7. Enter the website's build command and output directory.
+8. Save the project and run the first deployment.
+
+Cloudflare Pages can create preview deployments for non-production branches. Configure preview branch rules under the Pages project's build settings if you mirror preview branches from Forgejo.
+
+The build command and output directory depend on the website. For example, many Astro sites use a build command such as `pnpm build` and publish the generated `dist` directory. Keep those details in the website repository so the deployment remains reproducible.
+
+## Step 5: validate the complete path
+
+Do not call the workflow complete because the settings page accepted the token. Prove each layer.
+
+### 1. Confirm the baseline
+
+Verify that Forgejo and GitHub still have the same `main` commit before creating the test commit.
+
+### 2. Create a harmless Forgejo-originated commit
+
+Use a documentation-only change or an empty commit:
+
+```bash
+git clone https://forgejo.example.com/OWNER/REPO.git
+cd REPO
+git commit --allow-empty -m "chore: verify Forgejo publishing path"
+git push origin main
+```
+
+If your repository requires pull requests, create and merge the validation change through Forgejo instead of pushing directly to `main`.
+
+### 3. Verify the Forgejo mirror
+
+Open **Settings** > **Repository** > **Mirror Settings**. Check the push mirror status. Use **Synchronize Now** if the push-on-commit event has not run yet.
+
+Forgejo should report a successful synchronization without authentication or branch-rule errors.
+
+### 4. Verify GitHub
+
+Confirm that GitHub `main` contains the exact Forgejo commit ID. The commit should arrive without a manual GitHub push.
+
+### 5. Verify Cloudflare Pages
+
+Open the Pages project's deployment history and confirm that:
+
+- a production build started for the mirrored commit,
+- the deployment used the expected production branch,
+- the build completed successfully,
+- the deployed commit ID matches Forgejo and GitHub.
+
+### 6. Verify the public site
+
+Load the production URL and perform one focused check that matters for the site: homepage response, expected title, redirect behavior, or another stable contract.
+
+The verified chain should now be:
+
+```text
+Forgejo commit ID
+  = GitHub commit ID
+  = Cloudflare Pages deployed commit ID
+```
+
+## Operating the workflow
+
+### Make changes only in Forgejo
+
+Use Forgejo branches, pull requests, reviews, and merge controls. GitHub is the deployment repository, not a second collaboration surface.
+
+### Track token expiration
+
+A mirror with an expired token stops publishing while Forgejo remains healthy. Record the token owner, repository, expiration date, and rotation procedure without recording the token value.
+
+Rotate one repository at a time:
+
+1. Create the replacement token.
+2. Update the Forgejo push mirror credential.
+3. Synchronize and verify it.
+4. Revoke the old token after the new path is proven.
+
+### Monitor mirror failures
+
+At minimum, check Forgejo's push mirror status after important merges. For unattended production use, add monitoring or a scheduled parity check that compares the Forgejo and GitHub production commit IDs.
+
+### Handle an emergency GitHub commit
+
+If somebody commits directly to GitHub after cutover:
+
+1. Pause or disable the Forgejo push mirror.
+2. Freeze writes on both sides.
+3. Import the GitHub commit into Forgejo.
+4. Resolve conflicts in Forgejo.
+5. Verify the production branch matches.
+6. Resume the mirror.
+
+Do not allow the next forced mirror push to erase an emergency fix before it reaches the canonical repository.
+
+## Troubleshooting
+
+| Symptom                                             | Likely cause                                                                           | Check                                                                             |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Forgejo reports `401` or `403`                      | Wrong token, expired token, wrong resource owner, or missing Contents write permission | Token repository selection, expiration, and permissions                           |
+| GitHub rejects the push to `main`                   | Branch protection or repository rules block the token owner                            | GitHub rulesets and required pull-request policy; do not disable controls blindly |
+| Workflow-file updates fail                          | Token cannot modify `.github/workflows/*`                                              | Add Workflows write permission only if needed                                     |
+| Forgejo sync succeeds but Cloudflare does not build | Wrong Pages repository, production branch, branch controls, or build watch paths       | Cloudflare Git integration and build settings                                     |
+| Cloudflare builds the wrong branch                  | Production branch is not `main`                                                        | **Settings** > **Builds** > **Branch control**                                    |
+| GitHub refs disappear or are overwritten            | Mirror ran without a branch filter and used force-mirror behavior                      | Restore refs from Forgejo or backup, then add an intentional branch filter        |
+| SSH mirror misses LFS objects                       | Forgejo does not implement LFS mirroring over SSH                                      | Use an HTTPS mirror or handle LFS separately                                      |
+
+## Rollback
+
+If the mirror causes unexpected behavior:
+
+1. Disable or remove the affected Forgejo push mirror.
+2. Stop writes while comparing Forgejo and GitHub refs.
+3. Preserve the last known-good branch tips on both forges.
+4. Keep the GitHub repository connected to Cloudflare Pages unless the deployment integration itself is the problem.
+5. Do not revoke or delete credentials until you understand the failure and have a recovery path.
+
+Disabling the mirror stops new publication. It does not remove previous GitHub commits or Cloudflare deployments.
+
+## Security checklist
+
+- [ ] Forgejo is the documented canonical source.
+- [ ] GitHub is treated as deployment-only after cutover.
+- [ ] Existing repositories were aligned before enabling the mirror.
+- [ ] The GitHub token can access only one repository.
+- [ ] The token has Contents read/write and no unrelated permissions.
+- [ ] The token has a documented expiration and owner.
+- [ ] The token value is stored outside Git and documentation.
+- [ ] The Forgejo branch filter is intentional.
+- [ ] Branch protections were not disabled to make mirroring easier.
+- [ ] A Forgejo-originated commit was verified in GitHub and Cloudflare Pages.
+- [ ] Rollback and emergency GitHub-import procedures are documented.
+
+## Companion guide
+
+The website half of this workflow is covered in [Build a Static Astro Website for Cloudflare Pages](/docs/infrastructure/build-static-astro-website-cloudflare-pages/). It explains creating and structuring the Astro project, typed Markdown content, local validation, and the `dist/` build consumed by Cloudflare Pages.
+
+## Sources
+
+- [Forgejo repository mirrors](https://forgejo.org/docs/v15.0/user/repo-mirror/)
+- [GitHub: Managing personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)
+- [Cloudflare Pages GitHub integration](https://developers.cloudflare.com/pages/configuration/git-integration/github-integration/)
