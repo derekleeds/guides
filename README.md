@@ -22,14 +22,14 @@
 
 ## Tech stack
 
-| Component | Technology | Purpose |
-| :--- | :--- | :--- |
-| <img src="https://cdn.simpleicons.org/astro/BC52EE" alt="Astro" width="28"> | **Astro 7 + Starlight** | Builds the static documentation site, navigation, search, and accessible page structure. |
-| <img src="https://cdn.simpleicons.org/markdown/000000" alt="Markdown" width="28"> | **Markdown and MDX** | Stores durable, reviewable guide content. |
-| <img src="https://cdn.simpleicons.org/react/61DAFB" alt="React" width="28"> | **React** | Supports Keystatic and the small interactive surfaces that require it. |
-| <img src="https://cdn.simpleicons.org/typescript/3178C6" alt="TypeScript" width="28"> | **TypeScript** | Keeps configuration and content integrations predictable. |
-| <img src="https://cdn.simpleicons.org/pnpm/F69220" alt="pnpm" width="28"> | **pnpm** | Installs the pinned dependency graph and runs project checks. |
-| <img src="https://cdn.simpleicons.org/cloudflare/F38020" alt="Cloudflare" width="28"> | **Cloudflare Pages** | Publishes the generated static site. |
+| Component                                                                             | Technology              | Purpose                                                                                  |
+| :------------------------------------------------------------------------------------ | :---------------------- | :--------------------------------------------------------------------------------------- |
+| <img src="https://cdn.simpleicons.org/astro/BC52EE" alt="Astro" width="28">           | **Astro 7 + Starlight** | Builds the static documentation site, navigation, search, and accessible page structure. |
+| <img src="https://cdn.simpleicons.org/markdown/000000" alt="Markdown" width="28">     | **Markdown and MDX**    | Stores durable, reviewable guide content.                                                |
+| <img src="https://cdn.simpleicons.org/react/61DAFB" alt="React" width="28">           | **React**               | Supports Keystatic and the small interactive surfaces that require it.                   |
+| <img src="https://cdn.simpleicons.org/typescript/3178C6" alt="TypeScript" width="28"> | **TypeScript**          | Keeps configuration and content integrations predictable.                                |
+| <img src="https://cdn.simpleicons.org/pnpm/F69220" alt="pnpm" width="28">             | **pnpm**                | Installs the pinned dependency graph and runs project checks.                            |
+| <img src="https://cdn.simpleicons.org/cloudflare/F38020" alt="Cloudflare" width="28"> | **Cloudflare Pages**    | Publishes the generated static site.                                                     |
 
 ## Local development
 
@@ -80,12 +80,12 @@ Astro writes the site to `dist/`.
 
 ## Deployment
 
-| Setting | Value |
-| :--- | :--- |
-| Production branch | `main` |
-| Build command | `pnpm build` |
-| Build output | `dist` |
-| Node.js | `22.12` or newer |
+| Setting           | Value            |
+| :---------------- | :--------------- |
+| Production branch | `main`           |
+| Build command     | `pnpm build`     |
+| Build output      | `dist`           |
+| Node.js           | `22.12` or newer |
 
 ```text
 Forgejo homelab/guides
