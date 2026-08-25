@@ -46,6 +46,12 @@
   margin-inline: auto;
 }
 
+.tool-hero img[src$="/tailscale.svg"] {
+  padding: 1rem;
+  border-radius: 1rem;
+  background: #242424;
+}
+
 .tool-hero figcaption {
   margin-top: 0.5rem;
   color: var(--sl-color-gray-3);
