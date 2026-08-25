@@ -8,6 +8,8 @@ sidebar:
   label: "Section overview"
 ---
 
+- [Design a Tailscale access policy](/docs/security/tailscale-access-policy/)
+- [Manage Tailscale policy with GitHub Actions](/docs/security/tailscale-policy-github-actions/)
 - [SEL and Cynefin framework for agent autonomy](/docs/security/sel-cynefin-framework/)
 - [1Password secrets management for OpenClaw](/docs/security/1password-secrets-management/)
 - [Building modular content moderation with guardrails](/docs/openclaw/guardrails-skill/)
