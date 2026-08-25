@@ -5,15 +5,15 @@ description: "Privacy policy for Derek's Guides website."
 
 ## Privacy Policy
 
-**Last updated:** August 19, 2026
+**Last updated:** August 25, 2026
 
 ### Information We Collect
 
 This website is a static documentation site published with Cloudflare Pages. It
-has no accounts, forms, comments, or analytics. The site owner does not collect,
-store, or process personal information through the site.
+has no accounts, forms, or comments, and does not ask visitors to submit personal
+information through site features.
 
-### Cookies and Tracking
+### Browser Storage
 
 The site does not set cookies. Starlight can store a light, dark, or automatic
 theme preference in the visitor's browser. That preference stays in local
@@ -21,7 +21,7 @@ browser storage and is not sent to the site owner.
 
 ### Third-Party Services
 
-- **Cloudflare Pages** — Builds and publishes this website from the source repository. See
+- **Cloudflare Pages** — Builds and serves this website from the source repository. Cloudflare may process technical request data when delivering the site under
   [Cloudflare's Privacy Policy](https://www.cloudflare.com/privacypolicy/)
 
 ### External Links
@@ -35,5 +35,4 @@ For questions about this policy, contact: contact@derekleeds.com
 
 ---
 
-_This is a static documentation site with no user accounts, forms, analytics,
-or owner-operated data collection._
+_This is a static documentation site with no user accounts, forms, comments, or owner-operated submission features._
