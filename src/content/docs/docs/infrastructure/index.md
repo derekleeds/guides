@@ -8,6 +8,8 @@ sidebar:
   label: "Section overview"
 ---
 
+- [Tailscale for people and AI agents](/docs/infrastructure/tailscale-for-people-and-ai-agents/)
+- [DockTail: private Docker services over Tailscale](/docs/infrastructure/docktail/)
 - [Documenting architecture decisions and their rationale](/docs/infrastructure/architectural-decisions/)
 - [Publishing from Forgejo through GitHub to Cloudflare Pages](/docs/infrastructure/forgejo-github-cloudflare-pages-one-way-publishing/)
 - [Building a static Astro website for Cloudflare Pages](/docs/infrastructure/build-static-astro-website-cloudflare-pages/)
