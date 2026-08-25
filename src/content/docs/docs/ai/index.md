@@ -18,3 +18,7 @@ Start here if you need the concepts before the implementation details.
 - [Agent systems glossary](/docs/ai/agent-systems-glossary/)
 - [APIs, MCP, and CLIs](/docs/ai/apis-mcp-and-clis/)
 - [Choosing a project method with Cynefin](/docs/ai/cynefin-project-management/)
+
+## Recommended tools
+
+- [Build a practical AI toolkit](/docs/ai/recommended-tools/)

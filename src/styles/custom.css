@@ -34,3 +34,20 @@
 .sl-markdown-content table {
   font-size: 0.94rem;
 }
+
+.tool-hero {
+  text-align: center;
+}
+
+.tool-hero img {
+  display: block;
+  max-width: min(100%, 40rem);
+  height: auto;
+  margin-inline: auto;
+}
+
+.tool-hero figcaption {
+  margin-top: 0.5rem;
+  color: var(--sl-color-gray-3);
+  font-size: 0.85rem;
+}
