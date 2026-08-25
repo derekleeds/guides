@@ -8,10 +8,14 @@ categories: [agents, architecture]
 tags: [memory, openclaw, lcm, qmd, mcp, retrieval]
 weight: 30
 sidebar:
-  order: 1
-  label: "Memory architecture"
+  order: 2
+  label: "Earlier four-layer model"
 description: "Design AI agent memory by separating live context, durable Markdown, conversation compaction, and searchable retrieval with tools such as Lossless Claw and QMD."
 ---
+
+:::note[Looking for the current architecture?]
+This guide preserves an earlier four-layer model that was valid for its time. Start with [Build a Memory Architecture for AI Agents](/docs/memory-management/current-agent-memory-architecture/) for the current layered approach.
+:::
 
 An agent memory system is easier to maintain when each layer has one job.
 Problems start when a prompt, a transcript, a notes folder, and a vector index

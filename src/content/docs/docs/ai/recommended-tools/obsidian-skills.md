@@ -80,6 +80,8 @@ Good rules include:
 
 Obsidian works well as agent memory because it does not require people to surrender ownership of the knowledge. The files remain visible, editable, and understandable outside the agent.
 
+For the larger system around the vault, see [Build a Memory Architecture for AI Agents](/docs/memory-management/current-agent-memory-architecture/).
+
 ## Official resources
 
 - [Obsidian](https://obsidian.md/)

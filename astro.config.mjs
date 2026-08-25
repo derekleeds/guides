@@ -2,6 +2,7 @@ import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import starlight from "@astrojs/starlight";
 import keystatic from "@keystatic/astro";
+import mermaid from "astro-mermaid";
 import { defineConfig } from "astro/config";
 
 const keystaticMode = process.env.PUBLIC_KEYSTATIC_MODE;
@@ -10,6 +11,7 @@ const enableKeystatic = keystaticMode === "local";
 export default defineConfig({
   site: "https://guides.derekleeds.cloud",
   integrations: [
+    mermaid({ autoTheme: true, enableLog: false }),
     ...(enableKeystatic ? [keystatic()] : []),
     react(),
     starlight({
