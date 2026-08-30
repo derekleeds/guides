@@ -103,7 +103,7 @@ install -m 600 /dev/null ~/.hermes/.op.env
 ${EDITOR:-vi} ~/.hermes/.op.env
 ```
 
-Add one line in the editor: `OP_SERVICE_ACCOUNT_TOKEN=<your token>`.
+Add one line in the editor: `OP_SERVICE_ACCOUNT_TOKEN=PASTE_TOKEN_HERE`.
 
 Hermes auto-loads `.op.env` at startup, after `.env`, and never overrides a token already present in the environment. `.op.env` is gitignored by default.
 
