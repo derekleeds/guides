@@ -56,3 +56,7 @@ Before publishing:
 - verify no placeholder text or stale Hugo shortcodes remain.
 
 Do not commit, push, or open a pull request unless the user explicitly authorizes that Git action.
+
+## Visual contract
+
+Read `DESIGN.md` before visual or component work. Keep it aligned with implementation changes and validate it with `npx -y @google/design.md@0.4.0 lint DESIGN.md`.

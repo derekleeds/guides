@@ -23,8 +23,13 @@
   --sl-color-gray-4: #aab4c0;
   --sl-color-gray-5: #dbe1e8;
   --sl-color-gray-6: #eef2f6;
-  --sl-color-gray-7: #f7f9fb;
+  --sl-color-gray-7: #f3efe5;
   --sl-color-black: #ffffff;
+}
+
+:focus-visible {
+  outline: 3px solid #966f16;
+  outline-offset: 3px;
 }
 
 .hero .tagline {
