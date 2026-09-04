@@ -195,17 +195,11 @@ hermes
 
 Useful first requests are deliberately boring:
 
-```text
-Read AGENTS.md and Vault Index.md. List the active projects without changing files.
-```
+> Read `AGENTS.md` and `Vault Index.md`. List the active projects without changing files.
 
-```text
-Search for an existing note about deployment rollback. Return paths and short excerpts only.
-```
+> Search for an existing note about deployment rollback. Return paths and short excerpts only.
 
-```text
-Read the complete target note, add one dated verification section, then read the changed section back.
-```
+> Read the complete target note, add one dated verification section, then read the changed section back.
 
 Direct file access has the fewest moving parts and works when Obsidian is closed. Its weakness is retrieval: filename lookup and ordinary text search are less useful when the question and note use different words.
 
@@ -323,10 +317,10 @@ For the conceptual role of Obsidian in an agent stack, continue with [Use Obsidi
 
 ## Sources
 
-[1] https://help.obsidian.md/vault — Create a vault - Obsidian Help
-[2] https://fortelabs.com/blog/para — The PARA Method - Forte Labs
-[3] https://github.com/coddingtonbear/obsidian-local-rest-api — Local REST API with MCP
-[4] https://community.obsidian.md/plugins/obsidian-local-rest-api — Local REST API with MCP - Obsidian Community Plugins
-[5] https://github.com/flowing-abyss/obsidian-hybrid-search — Obsidian Hybrid Search
-[6] https://hermes-agent.nousresearch.com/docs/user-guide/features/mcp — MCP - Hermes Agent
-[7] https://github.com/kepano/obsidian-skills — Agent Skills for Obsidian
+- [1] [Create a vault — Obsidian Help](https://help.obsidian.md/vault)
+- [2] [The PARA Method — Forte Labs](https://fortelabs.com/blog/para/)
+- [3] [Local REST API with MCP — GitHub](https://github.com/coddingtonbear/obsidian-local-rest-api)
+- [4] [Local REST API with MCP — Obsidian Community Plugins](https://community.obsidian.md/plugins/obsidian-local-rest-api)
+- [5] [Obsidian Hybrid Search — GitHub](https://github.com/flowing-abyss/obsidian-hybrid-search)
+- [6] [MCP — Hermes Agent documentation](https://hermes-agent.nousresearch.com/docs/user-guide/features/mcp)
+- [7] [Agent Skills for Obsidian — GitHub](https://github.com/kepano/obsidian-skills)
