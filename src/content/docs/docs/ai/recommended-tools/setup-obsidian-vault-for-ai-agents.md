@@ -10,6 +10,11 @@ description: "Build a PARA-organized Obsidian vault, define safe agent boundarie
 weight: 4
 ---
 
+<figure class="tool-hero">
+  <img src="/images/recommended-tools/obsidian.svg" alt="Obsidian logo" width="240" height="240" />
+  <figcaption>Obsidian icon from <a href="https://selfh.st/icons/">selfh.st/icons</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</figcaption>
+</figure>
+
 An Obsidian vault can be a useful shared knowledge layer for people and AI agents because it is still an ordinary folder of Markdown files. The hard part is not creating the folder. It is deciding what belongs there, who may change it, and how agents will find the right note without turning the vault into a transcript landfill.
 
 This guide sets up the smallest structure that works, then adds agent access in three levels:
