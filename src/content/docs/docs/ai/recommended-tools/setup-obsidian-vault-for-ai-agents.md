@@ -1,0 +1,332 @@
+---
+title: "Set Up an Obsidian Vault for People and AI Agents"
+linkTitle: "Set up an agent-ready Obsidian vault"
+date: 2026-09-04
+lastUpdated: 2026-09-04
+authors: ["Derek Leeds"]
+categories: [ai, agents]
+tags: [ai, agents, obsidian, para, mcp, knowledge-management]
+description: "Build a PARA-organized Obsidian vault, define safe agent boundaries, and add file, REST API, or hybrid-search access one layer at a time."
+weight: 4
+---
+
+An Obsidian vault can be a useful shared knowledge layer for people and AI agents because it is still an ordinary folder of Markdown files. The hard part is not creating the folder. It is deciding what belongs there, who may change it, and how agents will find the right note without turning the vault into a transcript landfill.
+
+This guide sets up the smallest structure that works, then adds agent access in three levels:
+
+1. direct file access;
+2. Obsidian's Local REST API plugin through REST or MCP; and
+3. Obsidian Hybrid Search through MCP.
+
+Stop at the first level that solves the real problem. More integration means more capability, but also more credentials, services, indexes, and failure modes.
+
+## Before you start
+
+You need:
+
+- [Obsidian](https://obsidian.md/) installed;
+- a folder you can back up and, if needed, synchronize across devices;
+- an AI agent running on the same computer or with deliberate access to that folder; and
+- a clear boundary between notes, executable source, live system state, and secrets.
+
+Obsidian calls each local folder of notes a **vault**. You can create an empty vault or open an existing folder as one.[1]
+
+Do not place API keys, passwords, private keys, recovery codes, or decrypted secrets in the vault. Store those in a secrets manager. If an agent needs a credential, resolve it at runtime rather than pasting it into a note or prompt.
+
+## 1. Create the vault
+
+In Obsidian:
+
+1. Select **Create new vault**.
+2. Give it a stable name.
+3. Choose a location you can protect and back up.
+4. Open the new vault.
+
+Create these four folders:
+
+```text
+1_Projects/
+2_Areas/
+3_Resources/
+4_Archive/
+```
+
+The numeric prefixes are our convention, not a PARA requirement. They keep the folders in lifecycle order in file browsers and terminal output.
+
+Add one root navigation note, such as `Vault Index.md`, with links to the active project and area indexes. Do not create a complicated taxonomy before you have notes to organize. Empty scaffolding is still clutter; it merely arrived early.
+
+## 2. Use PARA as a lifecycle
+
+[PARA](https://fortelabs.com/blog/para/) organizes information by actionability rather than by an elaborate subject taxonomy. Its four categories are Projects, Areas, Resources, and Archives.[2]
+
+### Projects: work with an outcome
+
+Use `1_Projects/` when the work has a result that can be completed, paused, or abandoned.
+
+Examples:
+
+- launch a website;
+- migrate an application;
+- prepare a conference talk; or
+- investigate and close an incident.
+
+A project folder should usually contain an `_Index.md` or `Plan.md` that states the outcome, current status, important links, and next action. When the outcome is complete, write a short closeout and move the material to the matching location under `4_Archive/`.
+
+### Areas: responsibilities that continue
+
+Use `2_Areas/` for work you expect to maintain without a defined finish line.
+
+Examples:
+
+- engineering operations;
+- professional development;
+- household finances; or
+- a homelab service catalog.
+
+An area can produce projects. “Website operations” may be an area; “migrate the website to Astro” is a project.
+
+### Resources: reusable reference
+
+Use `3_Resources/` for material that may support several projects or areas but has no active outcome of its own.
+
+Examples:
+
+- templates;
+- language notes;
+- vendor references; or
+- reusable checklists.
+
+A resource is not a dumping ground for anything that was difficult to classify. If a note exists because of active work, keep it near that work until it becomes genuinely reusable.
+
+### Archive: inactive context
+
+Use `4_Archive/` for completed, retired, superseded, or paused material that is still worth preserving.
+
+Archive does not mean “delete.” It means “do not treat this as current.” Preserve dates, closeout notes, and links to replacements so agents can distinguish history from active guidance.
+
+### The placement test
+
+Ask these questions in order:
+
+1. Does this support a defined outcome? Put it in **Projects**.
+2. Does it support an ongoing responsibility? Put it in **Areas**.
+3. Is it reusable reference without an active outcome? Put it in **Resources**.
+4. Is it no longer active? Put it in **Archive**.
+
+Prefer an existing owner over a new folder. Search first; duplication is much easier to create than to reconcile.
+
+## 3. Decide what the vault owns
+
+A vault works best as curated narrative knowledge, not as a copy of every system around it.
+
+- **Obsidian owns:** plans, decisions, investigations, runbooks, meeting notes, dated observations, and project closeouts.
+- **Git owns:** code, configuration, automation, schemas, and machine-readable desired state.
+- **Live systems own:** current runtime state, inventory, health, and operational facts.
+- **A secrets manager owns:** credentials and secret values.
+- **Session history owns:** the detailed chronology of what an agent said and tried.
+
+Link between those owners instead of copying their contents. A runbook can link to a repository path and record a tested commit. It should not become an unofficial fork of the manifest. A dated incident note can record what an API reported. It should not claim that observation is still current six months later.
+
+For the larger memory model, read [Build a Memory Architecture for AI Agents](/docs/memory-management/current-agent-memory-architecture/) and [Skills, Memory, and Context in Hermes](/docs/hermes/hermes-skills-memory-context/).
+
+## 4. Give agents a vault contract
+
+Put a short `AGENTS.md` at the vault root. Many coding and agent harnesses can load repository or workspace instructions automatically; other agents can be told to read it before touching the vault.
+
+Start with this:
+
+```markdown
+# Vault agent guide
+
+## Purpose
+
+This vault stores durable narrative knowledge in Obsidian-flavored Markdown.
+
+## Organization
+
+- `1_Projects/`: active work with a defined outcome
+- `2_Areas/`: ongoing responsibilities
+- `3_Resources/`: reusable reference
+- `4_Archive/`: completed, retired, or historical material
+
+## Source ownership
+
+- The vault owns plans, decisions, investigations, runbooks, and dated findings.
+- Git repositories own code and machine-readable desired state.
+- Live systems and APIs own current runtime state.
+- The secrets manager owns credentials. Never write secret values here.
+
+## Workflow
+
+1. Resolve and confirm the vault root.
+2. Search for an existing owner before creating a note.
+3. Read the nearest index, local instructions, template, and full target.
+4. Make the smallest coherent change.
+5. Update the nearest index when navigation changes.
+6. Verify the exact file and links after writing.
+7. Reindex the changed note when a search service is in use.
+
+## Safety
+
+- Do not delete, rename, or reorganize broadly without approval.
+- Do not overwrite a note you have not read completely.
+- Do not treat archived notes or old observations as current truth.
+- Keep one writer per file during parallel agent work.
+```
+
+Add narrower `AGENTS.md` files only where a folder truly needs different rules. Do not copy the same policy into every directory; one maintained contract beats twelve drifting ones.
+
+The [Agent Skills for Obsidian](https://github.com/kepano/obsidian-skills) project provides reusable skills for Obsidian-flavored Markdown, Bases, JSON Canvas, and related open formats.[7] Skills teach an agent how to work; they do not grant authority. Pair format guidance with explicit filesystem or API permissions.
+
+## 5. Choose an integration level
+
+### Level 1: direct file access
+
+**Best for:** one local agent, simple reading and writing, no need for semantic retrieval.
+
+Give the agent access only to the vault folder it needs. For a read-only pilot, grant read access and ask it to summarize known notes by exact path or text search. When writes are needed, require the read-before-write workflow from `AGENTS.md`.
+
+A local Hermes session can start from the vault root:
+
+```bash
+cd /path/to/your/vault
+hermes
+```
+
+Useful first requests are deliberately boring:
+
+```text
+Read AGENTS.md and Vault Index.md. List the active projects without changing files.
+```
+
+```text
+Search for an existing note about deployment rollback. Return paths and short excerpts only.
+```
+
+```text
+Read the complete target note, add one dated verification section, then read the changed section back.
+```
+
+Direct file access has the fewest moving parts and works when Obsidian is closed. Its weakness is retrieval: filename lookup and ordinary text search are less useful when the question and note use different words.
+
+Do not give an agent the entire home directory because one vault happens to live inside it. Scope the working directory, container mount, or filesystem tool to the vault or an even narrower subtree.
+
+### Level 2: Local REST API plugin
+
+**Best for:** live Obsidian-aware access, structured note operations, automation scripts, or agents that support remote MCP.
+
+Install [Local REST API with MCP](https://community.obsidian.md/plugins/obsidian-local-rest-api/) from Obsidian Community Plugins. The project exposes an authenticated HTTPS API and a built-in Streamable HTTP MCP server. It can read and write notes, patch specific headings or frontmatter, search the vault, inspect the active file, and execute Obsidian commands.[3][4]
+
+1. In Obsidian, open **Settings → Community plugins**.
+2. Browse for **Local REST API with MCP**, install it, and enable it.
+3. Open **Settings → Local REST API**.
+4. Keep the service bound to loopback unless you have designed a separate private access layer.
+5. Record the generated API key in your secrets manager, not in the vault.
+6. Trust the plugin's local certificate authority for `127.0.0.1`, or use another client-supported local TLS arrangement.
+7. Test the status endpoint before granting write authority.
+
+A basic REST health check is:
+
+```bash
+curl --cacert /path/to/obsidian-local-rest-api.crt \
+  https://127.0.0.1:27124/
+```
+
+The authenticated REST endpoints are useful for deterministic scripts. The built-in MCP endpoint is useful when an AI agent needs to discover and select vault tools. That distinction is explained in [APIs, MCP, and CLIs: Three Interfaces, Different Jobs](/docs/ai/apis-mcp-and-clis/).
+
+Hermes can add the plugin as an HTTP MCP server without placing the token on the command line:
+
+```bash
+hermes mcp add obsidian-live \
+  --url https://127.0.0.1:27124/mcp/ \
+  --auth header
+```
+
+Hermes prompts for the bearer token, stores the secret in its profile-local `.env`, discovers the available tools, and lets you select which tools to enable.[6] Start with read and search tools. Enable write, delete, command-execution, or binary-file tools only when a real workflow needs them.
+
+The plugin runs inside Obsidian, so this level depends on the desktop application being open. It also introduces a credential with broad vault authority. Do not expose the endpoint directly to the public internet, paste the token into `config.yaml`, or disable certificate validation as a permanent convenience.
+
+Project documentation:
+
+- [Local REST API repository](https://github.com/coddingtonbear/obsidian-local-rest-api)
+- [Interactive API documentation](https://coddingtonbear.github.io/obsidian-local-rest-api/)
+- [Obsidian Community Plugin page](https://community.obsidian.md/plugins/obsidian-local-rest-api)
+
+### Level 3: Obsidian Hybrid Search over MCP
+
+**Best for:** larger vaults, concept search, linked-note discovery, filtered retrieval, and agents that need strong read-oriented context.
+
+[Obsidian Hybrid Search](https://github.com/flowing-abyss/obsidian-hybrid-search) combines BM25 full-text search, semantic embeddings, fuzzy title and alias matching, metadata filters, links, and backlinks. It exposes the same retrieval engine through an Obsidian plugin, CLI, and MCP server.[5]
+
+For a local Hermes evaluation using the project's default local embeddings:
+
+```bash
+hermes mcp add obsidian-search \
+  --command npx \
+  --env OBSIDIAN_VAULT_PATH=/path/to/your/vault \
+  --args -y -p obsidian-hybrid-search@latest obsidian-hybrid-search-mcp
+```
+
+Then test it:
+
+```bash
+hermes mcp test obsidian-search
+```
+
+On first use, the package and local embedding model may be downloaded. For a maintained deployment, pin a reviewed package version instead of leaving `@latest`, persist the index on durable storage, and monitor index freshness.
+
+Hybrid Search is intentionally strongest at discovery and reading. Its MCP tools cover search, read, reindex, and status rather than general note mutation.[5] That can be a useful security boundary: let the retrieval service find evidence, then use a separate, narrower file or API path for approved writes.
+
+Use scoped search whenever possible. A worker researching one project rarely needs every private note in the vault. Ignore attachments, templates, generated content, or sensitive subtrees that should not enter retrieval.
+
+## 6. A practical multi-agent pattern
+
+Do not give every sub-agent unrestricted read-write access and hope the Markdown sorts itself out.
+
+Use this division instead:
+
+1. **Dispatcher:** reads the request, vault contract, and relevant indexes; decides which existing notes own the work.
+2. **Researchers:** use read-only file access or Hybrid Search to return paths, excerpts, sources, and conflicts.
+3. **Specialists:** draft bounded changes for separate files or sections.
+4. **Single writer:** re-reads each target, applies the smallest coherent changes, and updates shared indexes.
+5. **Verifier:** reads the exact changed files, checks links and metadata, and confirms search can retrieve them.
+
+The rule that prevents most parallel-editing pain is simple: **one writer per file**. Shared `_Index.md` files should be updated by the parent or a designated curator after workers finish, not by every worker concurrently.
+
+For Hermes, read [Getting Started with Hermes Agent](/docs/hermes/getting-started-hermes-agent/), [Hermes Agent Architecture](/docs/hermes/hermes-agent-architecture/), and the official [Hermes MCP documentation](https://hermes-agent.nousresearch.com/docs/user-guide/features/mcp).
+
+## 7. Verification checklist
+
+Before calling the vault agent-ready:
+
+- [ ] The vault opens normally in Obsidian.
+- [ ] The four PARA folders exist and their meanings are documented.
+- [ ] A root index links to active project and area indexes.
+- [ ] `AGENTS.md` states placement, authority, safety, and verification rules.
+- [ ] A separate backup exists and a restore has been tested.
+- [ ] The agent can read only the intended vault scope.
+- [ ] Read access is proven before write access is enabled.
+- [ ] No credential appears in Markdown, prompts, shell history, or checked-in configuration.
+- [ ] A test write was read back exactly and found through the chosen search path.
+- [ ] Parallel workflows assign one writer per file.
+- [ ] Archived notes are clearly historical.
+
+## Recommended adoption path
+
+1. Build the PARA folders and root contract.
+2. Use direct file access until filename and text search become limiting.
+3. Add Local REST API when you need live Obsidian operations or a structured write interface.
+4. Add Hybrid Search when retrieval quality or vault size justifies an index.
+5. Keep the write path narrower than the read path.
+
+For the conceptual role of Obsidian in an agent stack, continue with [Use Obsidian as Human and Agent Memory](/docs/ai/recommended-tools/obsidian-skills/). For credential boundaries, see [Keep Agent Secrets Out of Prompts with 1Password](/docs/ai/recommended-tools/1password/).
+
+## Sources
+
+[1] https://help.obsidian.md/vault — Create a vault - Obsidian Help
+[2] https://fortelabs.com/blog/para — The PARA Method - Forte Labs
+[3] https://github.com/coddingtonbear/obsidian-local-rest-api — Local REST API with MCP
+[4] https://community.obsidian.md/plugins/obsidian-local-rest-api — Local REST API with MCP - Obsidian Community Plugins
+[5] https://github.com/flowing-abyss/obsidian-hybrid-search — Obsidian Hybrid Search
+[6] https://hermes-agent.nousresearch.com/docs/user-guide/features/mcp — MCP - Hermes Agent
+[7] https://github.com/kepano/obsidian-skills — Agent Skills for Obsidian

@@ -80,6 +80,8 @@ Good rules include:
 
 Obsidian works well as agent memory because it does not require people to surrender ownership of the knowledge. The files remain visible, editable, and understandable outside the agent.
 
+For a complete setup path, including PARA organization and three levels of agent integration, see [Set Up an Obsidian Vault for People and AI Agents](/docs/ai/recommended-tools/setup-obsidian-vault-for-ai-agents/).
+
 For the larger system around the vault, see [Build a Memory Architecture for AI Agents](/docs/memory-management/current-agent-memory-architecture/).
 
 ## Official resources

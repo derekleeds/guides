@@ -40,6 +40,8 @@ This guide maps nine tools I recommend because each can own a clear part of that
 
 The useful pattern is not “install everything.” It is “add the smallest component that solves the next real problem.”
 
+If you are starting from an empty vault, follow [Set Up an Obsidian Vault for People and AI Agents](/docs/ai/recommended-tools/setup-obsidian-vault-for-ai-agents/) for our PARA structure and file, REST API, and MCP integration ladder.
+
 ## Start with boundaries, not brands
 
 Before installing a tool, answer four questions:
