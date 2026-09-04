@@ -10,9 +10,20 @@ description: "Build a PARA-organized Obsidian vault, define safe agent boundarie
 weight: 4
 ---
 
+import { Steps } from "@astrojs/starlight/components";
+
 <figure class="tool-hero">
-  <img src="/images/recommended-tools/obsidian.svg" alt="Obsidian logo" width="240" height="240" />
-  <figcaption>Obsidian icon from <a href="https://selfh.st/icons/">selfh.st/icons</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</figcaption>
+  <img
+    src="/images/recommended-tools/obsidian.svg"
+    alt="Obsidian logo"
+    width="240"
+    height="240"
+  />
+  <figcaption>
+    Obsidian icon from <a href="https://selfh.st/icons/">selfh.st/icons</a>,
+    licensed under{" "}
+    <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
+  </figcaption>
 </figure>
 
 An Obsidian vault can be a useful shared knowledge layer for people and AI agents because it is still an ordinary folder of Markdown files. The hard part is not creating the folder. It is deciding what belongs there, who may change it, and how agents will find the right note without turning the vault into a transcript landfill.
@@ -42,10 +53,17 @@ Do not place API keys, passwords, private keys, recovery codes, or decrypted sec
 
 In Obsidian:
 
+<Steps>
+
 1. Select **Create new vault**.
+
 2. Give it a stable name.
+
 3. Choose a location you can protect and back up.
+
 4. Open the new vault.
+
+</Steps>
 
 Create these four folders:
 
@@ -113,10 +131,17 @@ Archive does not mean “delete.” It means “do not treat this as current.”
 
 Ask these questions in order:
 
+<Steps>
+
 1. Does this support a defined outcome? Put it in **Projects**.
+
 2. Does it support an ongoing responsibility? Put it in **Areas**.
+
 3. Is it reusable reference without an active outcome? Put it in **Resources**.
+
 4. Is it no longer active? Put it in **Archive**.
+
+</Steps>
 
 Prefer an existing owner over a new folder. Search first; duplication is much easier to create than to reconcile.
 
@@ -218,13 +243,23 @@ Do not give an agent the entire home directory because one vault happens to live
 
 Install [Local REST API with MCP](https://community.obsidian.md/plugins/obsidian-local-rest-api/) from Obsidian Community Plugins. The project exposes an authenticated HTTPS API and a built-in Streamable HTTP MCP server. It can read and write notes, patch specific headings or frontmatter, search the vault, inspect the active file, and execute Obsidian commands.[3][4]
 
+<Steps>
+
 1. In Obsidian, open **Settings → Community plugins**.
+
 2. Browse for **Local REST API with MCP**, install it, and enable it.
+
 3. Open **Settings → Local REST API**.
+
 4. Keep the service bound to loopback unless you have designed a separate private access layer.
+
 5. Record the generated API key in your secrets manager, not in the vault.
+
 6. Trust the plugin's local certificate authority for `127.0.0.1`, or use another client-supported local TLS arrangement.
+
 7. Test the status endpoint before granting write authority.
+
+</Steps>
 
 A basic REST health check is:
 
@@ -288,11 +323,19 @@ Do not give every sub-agent unrestricted read-write access and hope the Markdown
 
 Use this division instead:
 
+<Steps>
+
 1. **Dispatcher:** reads the request, vault contract, and relevant indexes; decides which existing notes own the work.
+
 2. **Researchers:** use read-only file access or Hybrid Search to return paths, excerpts, sources, and conflicts.
+
 3. **Specialists:** draft bounded changes for separate files or sections.
+
 4. **Single writer:** re-reads each target, applies the smallest coherent changes, and updates shared indexes.
+
 5. **Verifier:** reads the exact changed files, checks links and metadata, and confirms search can retrieve them.
+
+</Steps>
 
 The rule that prevents most parallel-editing pain is simple: **one writer per file**. Shared `_Index.md` files should be updated by the parent or a designated curator after workers finish, not by every worker concurrently. This is not a concurrency lock: API writers should also use `ifMatch`, while direct-file writers should re-read immediately before writing and review the resulting diff.
 
@@ -316,11 +359,19 @@ Before calling the vault agent-ready:
 
 ## Recommended adoption path
 
+<Steps>
+
 1. Build the PARA folders and root contract.
+
 2. Use direct file access until filename and text search become limiting.
+
 3. Add Local REST API when you need live Obsidian operations or a structured write interface.
+
 4. Add Hybrid Search when retrieval quality or vault size justifies an index.
+
 5. Keep the write path narrower than the read path.
+
+</Steps>
 
 For the conceptual role of Obsidian in an agent stack, continue with [Use Obsidian as Human and Agent Memory](/docs/ai/recommended-tools/obsidian-skills/). For credential boundaries, see [Keep Agent Secrets Out of Prompts with 1Password](/docs/ai/recommended-tools/1password/).
 
