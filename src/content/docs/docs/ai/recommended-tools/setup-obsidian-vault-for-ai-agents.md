@@ -198,6 +198,8 @@ cd /path/to/your/vault
 hermes
 ```
 
+This sets the working directory and loads nearby project instructions; it is **not a filesystem sandbox**. Hermes and any shell tools still have the operating-system permissions of the account that launched them. For enforced isolation, use a dedicated OS account, a container with only the approved subtree mounted (read-only for researchers), or a vault-scoped filesystem tool.
+
 Useful first requests are deliberately boring:
 
 > Read `AGENTS.md` and `Vault Index.md`. List the active projects without changing files.
@@ -208,7 +210,7 @@ Useful first requests are deliberately boring:
 
 Direct file access has the fewest moving parts and works when Obsidian is closed. Its weakness is retrieval: filename lookup and ordinary text search are less useful when the question and note use different words.
 
-Do not give an agent the entire home directory because one vault happens to live inside it. Scope the working directory, container mount, or filesystem tool to the vault or an even narrower subtree.
+Do not give an agent the entire home directory because one vault happens to live inside it. Treat the working directory as context only; enforce scope with operating-system permissions, a container mount, or a filesystem tool limited to the vault or an even narrower subtree.
 
 ### Level 2: Local REST API plugin
 
@@ -243,6 +245,8 @@ hermes mcp add obsidian-live \
 
 Hermes prompts for the bearer token, stores the secret in its profile-local `.env`, discovers the available tools, and lets you select which tools to enable.[6] Start with read and search tools. Enable write, delete, command-execution, or binary-file tools only when a real workflow needs them.
 
+For REST API writes, read the document map and its `version`, then pass that value as `ifMatch` with the mutation. If the version no longer matches, re-read and reconcile instead of overwriting a human, Obsidian Sync, or another process. One designated agent writer is coordination; `ifMatch` is the lost-update control.
+
 The plugin runs inside Obsidian, so this level depends on the desktop application being open. It also introduces a credential with broad vault authority. Do not expose the endpoint directly to the public internet, paste the token into `config.yaml`, or disable certificate validation as a permanent convenience.
 
 Project documentation:
@@ -257,13 +261,13 @@ Project documentation:
 
 [Obsidian Hybrid Search](https://github.com/flowing-abyss/obsidian-hybrid-search) combines BM25 full-text search, semantic embeddings, fuzzy title and alias matching, metadata filters, links, and backlinks. It exposes the same retrieval engine through an Obsidian plugin, CLI, and MCP server.[5]
 
-For a local Hermes evaluation using the project's default local embeddings:
+This level requires Node.js 20 or newer and `npx`. For a local Hermes evaluation using the project's default local embeddings, pin the reviewed package release rather than executing an unreviewed future `latest`:
 
 ```bash
 hermes mcp add obsidian-search \
   --command npx \
   --env OBSIDIAN_VAULT_PATH=/path/to/your/vault \
-  --args -y -p obsidian-hybrid-search@latest obsidian-hybrid-search-mcp
+  --args -y -p obsidian-hybrid-search@0.15.2 obsidian-hybrid-search-mcp
 ```
 
 Then test it:
@@ -272,11 +276,11 @@ Then test it:
 hermes mcp test obsidian-search
 ```
 
-On first use, the package and local embedding model may be downloaded. For a maintained deployment, pin a reviewed package version instead of leaving `@latest`, persist the index on durable storage, and monitor index freshness.
+On first use, the package and local embedding model may be downloaded. Review release notes and update the pin deliberately, persist the index on durable storage, and monitor index freshness.
 
-Hybrid Search is intentionally strongest at discovery and reading. Its MCP tools cover search, read, reindex, and status rather than general note mutation.[5] That can be a useful security boundary: let the retrieval service find evidence, then use a separate, narrower file or API path for approved writes.
+Hybrid Search is intentionally strongest at discovery and reading. Its MCP tools cover search, read, reindex, and status rather than general note mutation.[5] That separates retrieval from mutation, but it does not make every indexed note safe to disclose: the `read` tool can fetch an indexed path directly.
 
-Use scoped search whenever possible. A worker researching one project rarely needs every private note in the vault. Ignore attachments, templates, generated content, or sensitive subtrees that should not enter retrieval.
+Use scoped search for relevance, not authorization. A worker researching one project rarely needs every private note in its results, but a per-query `scope` filter does not prevent direct reads elsewhere. For confidentiality, run a separate Hybrid Search instance whose `OBSIDIAN_VAULT_PATH` and OS/container mount expose only the authorized vault or subtree. Ignore sensitive paths before indexing and verify that both search and direct read reject them.
 
 ## 6. A practical multi-agent pattern
 
@@ -290,7 +294,7 @@ Use this division instead:
 4. **Single writer:** re-reads each target, applies the smallest coherent changes, and updates shared indexes.
 5. **Verifier:** reads the exact changed files, checks links and metadata, and confirms search can retrieve them.
 
-The rule that prevents most parallel-editing pain is simple: **one writer per file**. Shared `_Index.md` files should be updated by the parent or a designated curator after workers finish, not by every worker concurrently.
+The rule that prevents most parallel-editing pain is simple: **one writer per file**. Shared `_Index.md` files should be updated by the parent or a designated curator after workers finish, not by every worker concurrently. This is not a concurrency lock: API writers should also use `ifMatch`, while direct-file writers should re-read immediately before writing and review the resulting diff.
 
 For Hermes, read [Getting Started with Hermes Agent](/docs/hermes/getting-started-hermes-agent/), [Hermes Agent Architecture](/docs/hermes/hermes-agent-architecture/), and the official [Hermes MCP documentation](https://hermes-agent.nousresearch.com/docs/user-guide/features/mcp).
 
