@@ -8,6 +8,7 @@ sidebar:
   label: "Section overview"
 ---
 
+- [Stop mounting the Docker socket into monitoring containers](/docs/security/docker-socket-proxy-monitoring/)
 - [Design a Tailscale access policy](/docs/security/tailscale-access-policy/)
 - [Manage Tailscale policy with GitHub Actions](/docs/security/tailscale-policy-github-actions/)
 - [SEL and Cynefin framework for agent autonomy](/docs/security/sel-cynefin-framework/)
