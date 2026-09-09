@@ -1,0 +1,239 @@
+---
+title: "Stop Mounting the Docker Socket into Monitoring Containers"
+linkTitle: "Stop Mounting the Docker Socket"
+description: "Replace direct Docker socket mounts with a consumer-specific API proxy, then prove required reads work and writes return 403 Forbidden."
+date: 2026-09-10
+lastUpdated: 2026-09-10
+authors: ["Derek Leeds"]
+categories: [security, docker]
+tags: [docker, compose, socket-proxy, monitoring, least-privilege]
+weight: 10
+---
+
+import { Aside, Steps } from "@astrojs/starlight/components";
+
+Mounting `/var/run/docker.sock` into a monitoring container is convenient. It also gives that container access to Docker's control API. The Engine API can inspect workloads, create containers, mount host paths, execute commands, change networks, and stop services.[3]
+
+Adding `:ro` does not make those API calls read-only. Docker documents `ro` as a property of the bind mount inside the container; it does not change which requests the daemon accepts.[2]
+
+This guide replaces the direct mount with [Tecnativa's Docker Socket Proxy](https://github.com/Tecnativa/docker-socket-proxy). The monitor keeps the reads it needs, while representative write requests receive `403 Forbidden`.[4]
+
+<Aside type="danger">
+
+A socket proxy reduces authority; it does not make Docker access harmless. The proxy still talks to the real daemon and must be treated as privileged infrastructure.
+
+</Aside>
+
+## What you will build
+
+```text
+monitoring container
+  → private consumer-only network
+  → filtered Docker API proxy
+  → /var/run/docker.sock
+```
+
+The controls are:
+
+- no direct socket mount in the monitoring container;
+- one narrowly configured proxy per consumer or identical policy cohort;
+- `POST=0`, which allows only `GET` and `HEAD` requests;
+- explicit endpoint families for the reads the product actually uses;
+- no published Docker API port;
+- positive read tests and a negative mutation test.
+
+## 1. Decide whether the application needs Docker
+
+Start with the smallest answer. Some monitoring features can use host metrics, exported telemetry, or an agent-specific protocol without Docker API access.
+
+If the product does need Docker data, list the features you intend to keep:
+
+- container names, states, and health;
+- Docker system information;
+- image counts;
+- event streams;
+- logs.
+
+Management tools are a different class. A controller that creates, stops, updates, or executes commands in containers will not work through a read-only profile. Protect that controller as a host-control system instead of pretending a filesystem flag removes its authority.
+
+## 2. Give the consumer a minimal API profile
+
+Tecnativa maps environment variables to Docker API path prefixes. Setting a section to `1` grants it; `0` revokes it. `EVENTS`, `PING`, and `VERSION` default to enabled, while `CONTAINERS`, `INFO`, and other broader sections default to disabled. Set every important choice explicitly so an upstream default is not your policy.[4]
+
+| Consumer behavior         | Candidate sections                         |
+| ------------------------- | ------------------------------------------ |
+| Basic container inventory | `CONTAINERS`, `INFO`, `VERSION`, `PING`    |
+| Event-driven monitoring   | Add `EVENTS`                               |
+| Image metrics             | Add `IMAGES`                               |
+| Log viewer                | Usually `CONTAINERS`, `EVENTS`, and `INFO` |
+
+Keep unrelated sections disabled. If a feature fails, inspect the denied read and add only the matching section.
+
+## 3. Put the proxy on a private network
+
+The example below is a runnable test lab. It uses Docker Socket Proxy `v0.5.0`, the current release when this guide was prepared, pinned to its multi-platform digest.[5] Tecnativa recommends GitHub Container Registry for supported images.[4]
+
+The `monitor` service is a disposable stand-in. Replace its image and command with your monitoring application after the checks pass.
+
+```yaml
+services:
+  docker-proxy:
+    image: ghcr.io/tecnativa/docker-socket-proxy:v0.5.0@sha256:1f5038b54f06c3e18422902cf00ba21803d1c97805aae032e5e6673d532d3459
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      POST: "0"
+      CONTAINERS: "1"
+      INFO: "1"
+      VERSION: "1"
+      PING: "1"
+      EVENTS: "0"
+      IMAGES: "0"
+      NETWORKS: "0"
+      VOLUMES: "0"
+      SERVICES: "0"
+      TASKS: "0"
+      AUTH: "0"
+      SECRETS: "0"
+      EXEC: "0"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:2375/_ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 6
+    networks:
+      - docker-api
+
+  monitor:
+    image: curlimages/curl:8.16.0@sha256:463eaf6072688fe96ac64fa623fe73e1dbe25d8ad6c34404a669ad3ce1f104b6
+    command: ["-fsS", "http://docker-proxy:2375/_ping"]
+    environment:
+      DOCKER_HOST: tcp://docker-proxy:2375
+    depends_on:
+      docker-proxy:
+        condition: service_healthy
+    networks:
+      - docker-api
+
+networks:
+  docker-api:
+    internal: true
+```
+
+The proxy serves unauthenticated plain HTTP, so publish no host port and attach no unrelated workloads to this network.[4] If the application uses host networking, use a dedicated Unix socket or a separately reviewed loopback-only design instead of exposing port `2375` on the LAN or Internet.
+
+## 4. Test the allowed reads and denied write
+
+Save the example as `compose.yaml`, then run the smallest useful test:
+
+<Steps>
+
+1. Render the Compose model.
+
+   ```bash
+   docker compose config --quiet
+   ```
+
+2. Start only the proxy.
+
+   ```bash
+   docker compose up -d docker-proxy
+   ```
+
+3. Verify health and container inventory through the private network.
+
+   ```bash
+   docker compose run --rm monitor
+   docker compose run --rm monitor -fsS \
+     http://docker-proxy:2375/containers/json
+   ```
+
+   The first command prints `OK`; the second returns a JSON array.
+
+4. Prove a representative mutation is denied.
+
+   ```bash
+   test "$(docker compose run --rm monitor -sS -o /dev/null \
+     -w '%{http_code}' -X POST \
+     http://docker-proxy:2375/containers/create)" = 403
+   ```
+
+5. Remove the disposable lab.
+
+   ```bash
+   docker compose down
+   ```
+
+</Steps>
+
+The negative assertion matters. A working dashboard proves that reads function; it does not prove that writes are blocked.
+
+## 5. Replace the probe with the monitoring application
+
+<Steps>
+
+1. Replace the `monitor` image and command with the application's reviewed image.
+2. Keep `DOCKER_HOST=tcp://docker-proxy:2375` if the application supports it.
+3. Remove any `/var/run/docker.sock` mount from the application.
+4. Enable only the API sections required by the features you listed earlier.
+5. Re-run the positive reads and negative `403` assertion.
+
+</Steps>
+
+After deployment, inspect live state rather than trusting the Compose file alone. Confirm:
+
+- the consumer has no raw Docker socket mount;
+- only the proxy mounts the socket;
+- the proxy mount reports read-only;
+- the consumer points to the intended proxy;
+- the proxy has no published ports;
+- both containers remain healthy without restart loops.
+
+A raw socket left beside the proxy silently defeats the design.
+
+## 6. Validate the product, not only the proxy
+
+A proxy can pass its API checks while breaking part of the monitoring product. Verify the features you chose:
+
+- container names, state, and health are current;
+- image or event metrics remain available when enabled;
+- logs show no unexplained denied reads;
+- external dashboards receive fresh telemetry;
+- restart counts remain stable.
+
+Observe one product before expanding the pattern. A profile proven for one monitor is not automatically correct for another.
+
+## Common mistakes
+
+### Treating `:ro` as API authorization
+
+It is not. Use an API-filtering layer and test a denied write.
+
+### Sharing one broad proxy
+
+The broadest consumer defines the permissions for everyone attached to it. Separate proxies prevent a log viewer from inheriting another product's wider read surface.
+
+### Publishing port `2375`
+
+The proxy has no application authentication or TLS. Prefer no host port. Docker documents SSH and mutual TLS for remote daemon access, but those transport controls do not replace a consumer-specific API policy.[1]
+
+### Enabling every read endpoint
+
+Read access still exposes topology, labels, images, and configuration-adjacent metadata. Allow only what the selected feature set requires.
+
+### Changing the whole fleet at once
+
+Different products make different API calls. Pilot and validate them independently.
+
+## The durable lesson
+
+Do not make a dangerous interface merely look read-only. Reduce each consumer to the smallest API surface that supports its job, then prove both the allowed behavior and the denied behavior.
+
+## Sources
+
+[1] https://docs.docker.com/engine/security/protect-access — Docker: Protect the Docker daemon socket
+[2] https://docs.docker.com/engine/storage/bind-mounts — Docker: Bind mounts
+[3] https://docs.docker.com/reference/api/engine — Docker Engine API
+[4] https://github.com/Tecnativa/docker-socket-proxy — Tecnativa Docker Socket Proxy
+[5] https://github.com/Tecnativa/docker-socket-proxy/releases/tag/v0.5.0 — Tecnativa Docker Socket Proxy v0.5.0
