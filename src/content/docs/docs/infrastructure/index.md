@@ -9,6 +9,7 @@ sidebar:
 ---
 
 - [Tailscale for people and AI agents](/docs/infrastructure/tailscale-for-people-and-ai-agents/)
+- [Prove backups before you trust them](/docs/infrastructure/prove-backups-before-you-trust-them/)
 - [DockTail: private Docker services over Tailscale](/docs/infrastructure/docktail/)
 - [Documenting architecture decisions and their rationale](/docs/infrastructure/architectural-decisions/)
 - [Publishing from Forgejo through GitHub to Cloudflare Pages](/docs/infrastructure/forgejo-github-cloudflare-pages-one-way-publishing/)

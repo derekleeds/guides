@@ -1,0 +1,266 @@
+---
+title: "Prove Backups Before You Trust Them"
+description: "Build backup confidence through integrity checks, isolated restores, stable-source comparisons, and application startup tests."
+categories:
+  - infrastructure
+  - security
+tags:
+  - backup
+  - restic
+  - disaster-recovery
+  - restore-testing
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+A green backup job proves that a tool wrote something somewhere. It does not prove that you can recover a service.
+
+Real confidence comes from a chain of evidence:
+
+```text
+source inventory
+  -> successful backup
+  -> repository integrity check
+  -> isolated restore
+  -> restored/live comparison
+  -> application startup or semantic validation
+```
+
+This guide shows how to build that chain for a fleet of self-hosted Docker systems without turning the backup control plane into the only path to recovery.
+
+## Separate the layers
+
+A durable backup design has at least four independent layers:
+
+| Layer                  | Responsibility                                                      |
+| ---------------------- | ------------------------------------------------------------------- |
+| Desired state          | Declares policies, schedules, source paths, and exclusions          |
+| Backup control plane   | Enrolls agents, schedules jobs, and presents recovery operations    |
+| Backup engine          | Creates encrypted snapshots, checks repositories, and restores data |
+| Repository and storage | Retains backup packs independently of the control-plane UI          |
+
+The distinction matters during an outage. If the backup dashboard is unavailable, independently escrowed repository credentials and a standard backup client should still recover the data.
+
+Protect the control plane too: its database, private certificate authority material, configuration data, and credential-encryption key may be required to restore policy history and reconnect agents. That protection is separate from the repositories holding application data.
+
+## Inventory mutable state before writing policy
+
+Start from what cannot be recreated from source control:
+
+- named Docker volumes;
+- bind-mounted application data and configuration;
+- logical database exports;
+- selected host configuration;
+- certificate or identity state that is not reproducible;
+- application metadata that pairs with a separate asset store.
+
+Exclude runtime sockets, pseudo-filesystems, caches that are cheaper to rebuild, duplicate nested mounts, and anonymous volumes with no proven owner.
+
+For databases, distinguish file coverage from recoverability. Copying live PostgreSQL, SQLite, Redis, or database-volume files may provide useful forensic coverage, but it is not the same as a transactionally consistent dump or a tested application restore.
+
+## Give each policy an independent recovery boundary
+
+Use a separate repository per protected policy when independent credentials and retention boundaries are needed. A source subdirectory or snapshot tag inside one Restic repository is not a separate encryption or authorization boundary: repository credentials can access its snapshots. Store recovery credentials independently of the backup control plane.
+
+A policy record should answer:
+
+- which host or service it protects;
+- which exact paths or volumes it includes;
+- which paths it excludes;
+- which repository it uses;
+- where the repository password is escrowed;
+- who owns retention and pruning;
+- how often it runs;
+- what restore test proves it useful.
+
+If clients write to an append-only repository, keep retention and pruning on the server side. A compromised client should not be able to erase the history it previously wrote.
+
+## Begin with one non-sensitive pilot
+
+Before onboarding production paths:
+
+<Steps>
+
+1. Create a dedicated test repository.
+2. Back up a small, non-sensitive fixture.
+3. Run the backup engine's full repository data check.
+4. Restore into an isolated scratch directory.
+5. Compare the restored content with the source by checksum.
+6. Remove the plaintext scratch after evidence is recorded.
+
+</Steps>
+
+With Restic, the repository check should include pack data, not only metadata:
+
+```bash
+restic check --read-data
+```
+
+A successful restore plus matching SHA-256 proves repository access, decryption, extraction, and matching file content for the tested scope. A separate successful `check --read-data` verifies all repository pack data at that check time. It reads every pack and can incur substantial time, bandwidth, and retrieval costs. A random `--read-data-subset` check is sampling, not proof that all packs were read.
+
+### A reproducible, disposable pilot
+
+Save the following as `backup-restore-pilot.py` and run `python3 backup-restore-pilot.py`. It requires Python 3.11 or newer and Restic on `PATH`. The example was exercised with Restic 0.17.3; the cited stable documentation identifies itself as 0.19.1. Check your installed version and command help before adapting it.
+
+This creates only non-sensitive fixtures and a new local repository inside a temporary directory. It does not read production repositories or resolve real credentials. Its disposable encryption password exists only in process memory/environment and is never printed or written to a password file. Temporary-directory cleanup removes this pilot's repository and plaintext, including on normal Python exceptions; it is not secure erasure and cannot guarantee cleanup after forced termination.
+
+```python
+import hashlib
+import json
+import os
+from pathlib import Path
+import secrets
+import subprocess
+import tempfile
+
+
+def manifest(root):
+    result = {}
+    for path in sorted(root.rglob('*')):
+        if path.is_symlink():
+            raise ValueError('Pilot manifest does not support symbolic links')
+        if path.is_dir():
+            continue
+        if not path.is_file():
+            raise ValueError('Pilot manifest requires regular files')
+        with path.open('rb') as stream:
+            result[path.relative_to(root).as_posix()] = hashlib.file_digest(stream, 'sha256').hexdigest()
+    return result
+
+
+def main():
+    with tempfile.TemporaryDirectory(prefix='restore-pilot-') as scratch:
+        base = Path(scratch).resolve()
+        source = base / 'source'
+        source.mkdir()
+        (source / 'settings.json').write_text('{"enabled": true}\n')
+        (source / 'nested').mkdir()
+        (source / 'nested' / 'file with spaces.txt').write_text('non-sensitive fixture\n')
+        (source / 'empty.txt').touch()
+        before = manifest(source)
+        # Do not inherit production repository/password/backend settings.
+        env = {k: v for k, v in os.environ.items() if not k.startswith('RESTIC_')}
+        env['RESTIC_PASSWORD'] = secrets.token_urlsafe(32)  # Memory-only, disposable repository.
+        env['TMPDIR'] = str(base)
+
+        def restic(*args):
+            return subprocess.run(['restic', '--no-cache', '-r', str(base / 'repo'), *args],
+                                  env=env, check=True, capture_output=True, text=True, timeout=120).stdout
+
+        restic('init')
+        output = restic('backup', '--json', str(source))
+        summary = next(json.loads(line) for line in output.splitlines()
+                       if json.loads(line).get('message_type') == 'summary')
+        snapshot = summary['snapshot_id']
+        restic('check', '--read-data')
+        restored = base / 'restored'
+        restic('restore', f'{snapshot}:{source.as_posix()}', '--target', str(restored), '--verify')
+        assert before == manifest(source), 'Source changed during backup/test'
+        assert before == manifest(restored), 'Restored file paths or bytes differ'
+        (restored / 'settings.json').write_text('tampered\n')
+        assert before != manifest(restored), 'Manifest failed to detect changed bytes'
+        print('PASS: full pack check, exact-snapshot restore, three-file manifest parity, and tamper detection')
+    print('PASS: disposable repository and plaintext scratch removed')
+
+
+if __name__ == '__main__':
+    main()
+```
+
+The manifest compares relative regular-file names and SHA-256 values, including empty files and names containing spaces. It rejects symbolic links and special files. It does not prove ownership, permissions, ACLs, extended attributes, hard-link relationships, empty directories, or application health. Do not run with Python optimization (`-O`), which disables these assertions. For production, test required metadata separately and never substitute a changing live tree for the immutable fixture.
+
+## Add a semantic recovery test
+
+A byte-for-byte restore is necessary but may still be insufficient. The restored configuration could be complete yet unusable by the application.
+
+For a containerized service, strengthen the test:
+
+<Steps>
+
+1. Quiesce the application or obtain an application-consistent export/snapshot, then create a deterministic manifest of that stable source.
+2. Record the exact backup snapshot ID and paths; restore that snapshot into isolated scratch, never over production.
+3. Create the same manifest for the restored tree.
+4. Require the manifests to match.
+5. Start the compatible recorded image digest against the restored configuration in an isolated disposable container, without production mounts, credentials, outbound integrations, or public ports.
+6. Wait for the application's native health check.
+7. Confirm production remained unchanged.
+8. Remove the disposable container and plaintext scratch.
+
+</Steps>
+
+This proves recovery for the tested configuration scope. It does not automatically prove history volumes, caches, databases, external object storage, or in-place host restoration.
+
+Do not compare a historical backup to files that have changed since it was created and interpret the differences as corruption. Restic's `latest` must be scoped to the intended host/path/tag; recording an exact snapshot ID avoids selecting a different policy's backup. The restore `--path` flag filters snapshot selection, not the restored file subset. Use a path inspected with `restic ls` and the documented `snapshotID:subfolder` syntax or explicit include/exclude rules to constrain extraction. `restore --verify` checks restored content against the repository, not against an independent source manifest.
+
+For PostgreSQL, use a database-aware logical or physical backup procedure and prove it by restoring and querying the database. A live filesystem copy is not equivalent to `pg_dump`; physical backup requires the documented consistency and WAL requirements. Other databases need their own supported procedure. A checksum match or container health check alone does not establish transactional consistency, completeness of linked object storage, or useful application data.
+
+## Roll out by host with an evidence receipt
+
+For each new agent or host:
+
+- confirm the agent appears with the intended identity;
+- inventory meaningful persistent sources;
+- create a dedicated policy and repository boundary;
+- trigger the initial backup;
+- run a full repository data check;
+- restore one representative source in isolation;
+- compare it with the live source;
+- start the application when a safe semantic test exists;
+- enable the recurring schedule only after acceptance passes.
+
+Stagger fleet schedules so every host does not read storage and write to the repository simultaneously.
+
+If one host cannot reach the private repository, leave its policy disabled and document the gap. Do not create a public route or broaden network access merely to make the dashboard uniformly green.
+
+## Keep test and production policy roles separate
+
+A short-lived test policy is useful for proving a narrow restore. A broad production policy is useful for ongoing coverage. They do not need to remain duplicated forever.
+
+Once the production policy performs the same semantic gate:
+
+- retire the disabled test policy;
+- retain historical snapshots;
+- retain repository data;
+- retain independently escrowed credentials;
+- remove only the obsolete scheduler and policy record.
+
+Policy cleanup should not silently become repository deletion.
+
+## Write honest recovery claims
+
+Use precise language:
+
+| Evidence                                      | Claim you may make                                        |
+| --------------------------------------------- | --------------------------------------------------------- |
+| Job succeeded                                 | A snapshot was created                                    |
+| `check --read-data` passed                    | Repository pack data was readable                         |
+| Isolated restore succeeded                    | Content could be extracted                                |
+| Checksums matched                             | Restored bytes matched the tested source                  |
+| Exact image started healthy                   | The restored configuration supported application startup  |
+| Database dump restored and app queries passed | Semantic database recovery was proven for the tested case |
+
+Do not call a broad file-level backup fully recoverable when live database files have never been restored through a database-aware procedure.
+
+## A practical acceptance checklist
+
+- [ ] Desired-state policy is reviewed and secret-safe.
+- [ ] Repository storage lands on the intended durable mount.
+- [ ] Anonymous access is denied.
+- [ ] Credentials are independently escrowed.
+- [ ] Initial snapshot exists.
+- [ ] Full repository data check passes.
+- [ ] Isolated restore succeeds.
+- [ ] Restored content matches the source.
+- [ ] Application-level validation passes where applicable.
+- [ ] Plaintext scratch is removed.
+- [ ] Production remains unchanged during the test.
+- [ ] Retention, pruning, and offsite-copy ownership are explicit.
+
+The result is a backup system you can explain without relying on faith in a dashboard.
+
+## References
+
+- [Restic: repository integrity and consistency](https://restic.readthedocs.io/en/stable/045_working_with_repos.html#checking-integrity-and-consistency)
+- [Restic: restoring from a snapshot](https://restic.readthedocs.io/en/stable/050_restore.html#restoring-from-a-snapshot)
+- [PostgreSQL: backup and restore](https://www.postgresql.org/docs/current/backup.html)
+- [PostgreSQL: filesystem-level backup](https://www.postgresql.org/docs/current/backup-file.html)
