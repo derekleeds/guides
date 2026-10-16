@@ -8,6 +8,10 @@ sidebar:
   label: "Section overview"
 ---
 
+<figure class="tool-hero">
+  <img src="/images/openclaw/hero-openclaw.png" alt="Red OpenClaw mascot beside a glowing blue and orange network of circuit nodes" width="1680" height="720" />
+</figure>
+
 OpenClaw is an agent runtime and gateway. It coordinates models, workspaces,
 tools, skills, sessions, plugins, and communication channels. It can also route
 work to several isolated agents when their data or permissions need different
