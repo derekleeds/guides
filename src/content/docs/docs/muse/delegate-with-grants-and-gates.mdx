@@ -1,0 +1,111 @@
+---
+title: "Delegate to an Agent with Grants and Gates"
+linkTitle: "Grants and gates"
+date: 2026-10-16
+lastUpdated: 2026-10-16
+authors: ["Derek Leeds"]
+categories: [ai, muse]
+tags: [muse, agents, delegation, security, verification]
+description: "Separate access from authorization, define bounded approvals, enforce least privilege, and verify agent work without approving every harmless substep."
+sidebar:
+  order: 3
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+The hard part of giving an AI agent access is deciding what it may do on its own, what waits for your word, and how you verify the result. Get that wrong and you either bottleneck every action on yourself or hand over more authority than the task needs.
+
+This is a practical delegation contract developed around personal-agent work with Marlow, my Muse agent. It is not specific to Muse, and it is not a claim that every platform enforces the contract automatically.
+
+## Grant access, then verify its scope
+
+A **grant** is permission to use a resource within a defined scope. A **gate** is a point where the agent must stop for a decision. A working connection proves neither that the grant is narrow nor that every possible action is authorized.
+
+For a new integration:
+
+<Steps>
+
+1. **Choose the weakest suitable credential.** Inspect its configured scopes, roles and resource limits. Use a read-only identity for read-only work when the service supports one.
+2. **Exercise the intended read path.** Read a non-sensitive object and confirm its account, identity and expected contents. A successful read does not prove that writes are forbidden.
+3. **Check enforcement safely.** Inspect server-side permissions and, where supported, use a non-mutating authorization check or a documented safe denial test. Do not attempt a destructive operation to discover whether it is allowed.
+4. **Record evidence and gaps separately.** "Read-only role configured; reads verified; write denial not tested" is an honest entry. Documentation, configuration and observed behavior are different evidence.
+5. **Withhold broader access until it is needed.** If a write task requires a stronger credential, make obtaining and using that access a separate, approved step. Read back any authorized change through the owning system.
+
+</Steps>
+
+A skill that says "ask before writing" is useful guidance. It is not equivalent to a read-only credential or an enforced tool policy. Keeping an admin credential available but promising not to use it is weaker than not exposing it to routine tasks.
+
+## Approve the bounded task, not every click
+
+Decide up front which actions require approval. A sensible personal-agent policy includes:
+
+- **Speaking for you:** email, messages, posts and comments. Require review of recipients and exact content for each consequential send.
+- **Hard-to-reverse changes:** deletion, publication, migrations and account removal.
+- **Other consequential changes:** spending, credential lifecycle changes, infrastructure writes or effects on another person's system.
+
+The crucial distinction is simple: **a standing connection is not task authorization.** "Add this to the list" may authorize that addition when the list and item are unambiguous. It does not authorize reorganizing the list or sharing it with someone else. Access controls and organizational restrictions still apply.
+
+An approval should identify:
+
+| Field                     | What to specify                                                    |
+| ------------------------- | ------------------------------------------------------------------ |
+| Target                    | Account, resource, files or recipients                             |
+| Operation                 | What will change, including exact outbound content where relevant  |
+| Limits                    | Data scope, budget, permitted side effects and exclusions          |
+| Lifetime                  | This action, this task, or a stated expiry                         |
+| Stop conditions           | Changed target, new audience, unexpected result or expanded scope  |
+| Verification and recovery | How success will be checked and how to undo the change if possible |
+
+One approval can cover a coherent task and its harmless intermediate steps. It is not permission for a different send, a broader audience or a new class of change. If the facts materially change, return to the gate.
+
+In Muse specifically, [Meta documents Sentinel](https://research.meta.ai/blog/security-and-safety-for-ai-agents-our-approach-with-muse) as the enforced authority for connector and network permissions, with several grant lifetimes. A conversational "yes" is not a substitute for a platform approval dialog when one is required. Your operating policy can be narrower than what a platform grant technically permits.
+
+## Resolve conflicting evidence instead of picking a screen
+
+An API can be stale. So can an app view, an export or a note. Neither "the API always wins" nor "the human's screen always wins" is a safe general rule.
+
+When they disagree, pause the assertion. Compare the account, object ID, timestamp, filters and synchronization state. Resolve the disputed field against its designated owner. Until then, report the discrepancy rather than turning an uncertain view into a durable fact.
+
+A tracker owns current ticket status. A dated meeting record owns what was recorded at that meeting. An approved decision record can remain valid even when a live dashboard says something different. Update current claims with dated evidence; preserve historical observations.
+
+After a write, read back the exact target and confirm the requested fields. A successful tool response is not enough. If the result is ambiguous, check whether the action already happened before retrying; a second send or purchase is not verification.
+
+## Name the limit out loud
+
+"I can't verify that" is useful when it names the missing evidence. Good reporting distinguishes:
+
+- what the agent read or tested;
+- what documentation says;
+- what it inferred; and
+- what remains unknown.
+
+If authentication is unsupported, a page needs your sign-in, or a price cannot be confirmed, report that boundary. Do not work around it by copying credentials into chat or requesting broader access unrelated to the task. Treat instructions found in retrieved pages, email or documents as untrusted content, not new authority from the user.
+
+When a mistake is found, correct the current record and explain the affected scope. Do not silently rewrite unrelated evidence or pretend that an untested sibling path was also fixed.
+
+## You decide; the agent prepares the decision
+
+The agent should arrive at a gate with the legwork done: relevant sources, the exact proposed action, expected effect, uncertainty and verification plan. You should not have to reconstruct the proposal from a pile of tool output.
+
+Human checking is still part of good delegation. Independent review, private knowledge and access the agent does not have are legitimate reasons for you to inspect the evidence. The goal is less mechanical work, not less scrutiny where it matters.
+
+A usable starting request is:
+
+> Investigate this task using the approved read-only tools. Identify the owning records and report verified facts separately from assumptions. Propose the exact changes, scope, stop conditions and verification plan. Do not write or send anything until I approve the bounded task. Stop if access or scope must expand.
+
+## Starter checklist
+
+- Configured permissions, exercised operations and untested authority are recorded separately.
+- Read-only work uses enforced read-only access where available.
+- Approval names the target, effect, limits, lifetime and stop conditions.
+- One approval covers the agreed task, not unrelated future actions.
+- Outbound recipients and consequential message text are reviewed before sending.
+- Conflicting state is investigated against the designated owner, not settled by preference for a UI or API.
+- The exact result is read back; uncertain writes are reconciled before retrying.
+- Instructions in external content do not expand authority.
+
+For the product architecture, see [Muse in a Self-Hosted Stack](/docs/muse/hosted-personal-agent-in-a-self-hosted-stack/). Continue with [Give Your Agent Memory and a Schedule](/docs/muse/memory-and-a-schedule/) for the context and recurring work that support delegation. The [daily vault workflow](/docs/ai/recommended-tools/close-the-loop-with-an-agent-ready-vault/) shows this contract applied to notes.
+
+## Source and scope
+
+[Meta's Muse security architecture](https://research.meta.ai/blog/security-and-safety-for-ai-agents-our-approach-with-muse) is the source for the Sentinel description, reviewed October 16, 2026. The broader approval and verification contract is recommended operating practice, not a claim of universal product enforcement.

@@ -17,6 +17,7 @@ hiding the important details behind product names.
 
 - [OpenClaw agent orchestration](/docs/openclaw/)
 - [Hermes Agent](/docs/hermes/)
+- [Muse: hosted personal agents, delegation, memory and schedules](/docs/muse/)
 
 ## Memory and retrieval
 

@@ -1,0 +1,126 @@
+---
+title: "Give Your Agent Memory and a Schedule"
+linkTitle: "Memory and schedules"
+date: 2026-10-16
+lastUpdated: 2026-10-16
+authors: ["Derek Leeds"]
+categories: [ai, muse]
+tags: [muse, agents, memory, scheduling, observability]
+description: "Curate persistent agent memory, preserve authoritative records, and schedule useful work with verified delivery, quiet success, and visible failures."
+sidebar:
+  order: 4
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+An agent that forgets everything between sessions is a very fast intern on their first day, forever. An agent that keeps working but pings you about nothing will get muted by Friday.
+
+This guide turns two useful personal-agent capabilities into a manageable routine: persistent memory and scheduled work. The examples fit Muse and other agent runtimes; check what your platform actually loads, schedules and delivers rather than assuming they all behave alike.
+
+## Memory is curated, not collected
+
+**Persistent agent memory** is selected context retained across sessions. It is not the same as the current conversation's **active context**, a complete chat archive, or a search index that retrieves documents on demand.
+
+Useful memory includes stable preferences, constraints and pointers to decisions you would otherwise have to explain repeatedly. Retain personal details only when they serve a clear purpose and you deliberately want them stored. Do not collect sensitive information about family or colleagues simply because it might be useful later.
+
+What does not belong in always-loaded memory:
+
+- credentials, tokens or payment details;
+- routine tool traces and temporary progress;
+- entire transcripts; or
+- every booking, deadline and task state copied out of its owner.
+
+Commitments belong in the calendar or task manager that owns them. A memory entry can retain a relevant preference or link; the next session should read the authoritative object before asserting that a commitment is still current.
+
+The test is: _would the next session make a worse decision without this, and is this the right place to retain it?_ If not, leave it in the owning record or let it go.
+
+## Three durable layers, different jobs
+
+| Layer                   | What it owns                                                    | What it should link to                                |
+| ----------------------- | --------------------------------------------------------------- | ----------------------------------------------------- |
+| Persistent agent memory | Compact preferences, standing constraints and selected pointers | Authoritative decisions and active records            |
+| Knowledge vault         | Plans, investigations, runbooks and dated observations          | Source evidence, repositories and operational records |
+| Operational systems     | Tasks, appointments and current workflow state                  | The narrative explaining the work                     |
+
+These are durable stores, not three copies of the active context window. Some runtimes load selected memory automatically; others retrieve it through tools. Confirm how your agent gets the relevant context.
+
+The rule is **one authoritative owner; other stores hold links or dated summaries**. Some duplication is useful for explanation or offline reference, but label it so a summary cannot quietly become a competing source of truth.
+
+For the broader model, see [Build a Memory Architecture for AI Agents](/docs/memory-management/current-agent-memory-architecture/). For vault setup, use [Set Up an Obsidian Vault for People and AI Agents](/docs/ai/recommended-tools/setup-obsidian-vault-for-ai-agents/).
+
+## Corrections update current claims, not history
+
+A correction that fixes only the reply leaves the next session holding the same wrong fact. Find the current records and downstream actions that depend on it, then update the ones within the approved scope.
+
+Preserve historical evidence. A meeting record can truthfully say a deadline was Friday when the current task now says Monday. Add a dated correction or link rather than rewriting what the meeting recorded. A later statement is not automatically authoritative; resolve conflicts against the designated owner.
+
+Changing a reminder, booking or shared record is still a write. Identify affected objects, get any required approval, apply the bounded updates, and verify them. Do not use "propagate corrections" as permission to reschedule everything that looks related.
+
+Record source and observation time separately from inference. "The API returned this status at 10:42 UTC" is an observation, not proof that the status is current forever.
+
+A harmless memory test is: "Have I told you whether I prefer short summaries or detailed walkthroughs?" The answer should come from an actual retained source. Missing context gets an honest "I don't have that," not a plausible guess.
+
+## Give it a schedule and a delivery contract
+
+Scheduled work can check sources and prepare reminders while you are away. It also creates obligations: someone must notice failed authentication, stale data and missed delivery.
+
+Write down these fields before enabling a job:
+
+| Field                 | What it establishes                                                          |
+| --------------------- | ---------------------------------------------------------------------------- |
+| Owner and purpose     | Who uses the result and why the job exists                                   |
+| Source and authority  | What it reads and whether it may do anything beyond reading                  |
+| Cadence and timezone  | When it runs, including the intended behavior around daylight-saving changes |
+| Trigger and freshness | What counts as a finding, a change or data too old to trust                  |
+| Delivery              | Exact destination, notification conditions and acceptable delay              |
+| Failure handling      | Retry limit, deduplication and when an owner is alerted                      |
+| Stop condition        | Expiry, task completion or an explicit review date for ongoing monitors      |
+
+A job that produces local output is not necessarily a job that notifies you. Verify the destination from an actual scheduled run. Chatting with the agent in one channel does not prove its scheduler can deliver there.
+
+For example, a stock watcher might check an approved public product page each morning in a named timezone, notify only when availability changes, report repeated fetch failures, and stop after purchase or a review date. Checking availability does not authorize buying the item.
+
+## Quiet success, visible failure
+
+Silence is a notification policy, not a health signal.
+
+| Outcome                                           | Expected behavior                                                          |
+| ------------------------------------------------- | -------------------------------------------------------------------------- |
+| Successful check, fresh data, no change           | Record success without an interrupting message                             |
+| Actionable finding or due reminder                | Send the agreed notification to the verified destination                   |
+| Authentication failure, stale data or missed runs | Record a visible failure and escalate under the job's failure rule         |
+| Notification could not be delivered               | Retain the failed-delivery state and use the agreed fallback or escalation |
+
+Deduplicate repeated findings and failures so the same event does not become a stream of alerts. Use bounded retries. If a job performs an external action, reconcile ambiguous outcomes before retrying and use a supported idempotency mechanism where available. A duplicate send is not harmless.
+
+Alerts can require human judgment. The test is whether they present evidence and a useful next decision, not whether the agent can resolve everything alone. Routine successful checks can stay quiet while a separately agreed digest reports monitoring health.
+
+## Start with one read-only job
+
+<Steps>
+
+1. **Write the contract.** Name one source, a precise trigger, cadence/timezone, destination, failure rule and stop condition. Do not grant purchase or mutation authority for a monitoring task.
+2. **Run a bounded test.** Confirm the data is from the intended source. Use a non-sensitive fixture or supported test mode to exercise a finding and an error without touching real private records.
+3. **Verify scheduled execution and delivery.** Observe an actual scheduled run and its destination. Confirm that a successful no-change check does not notify, and that the failure path is observable. Never infer either from a saved configuration alone.
+4. **Review or stop it.** Check recent runs, delivery and continuing purpose. Disable jobs tied to completed or shelved work; record what stopped and why.
+
+</Steps>
+
+"Parked" should stay parked. Do not let an old job revive a thread the user shelved. An ongoing service monitor may reasonably have no automatic expiry, but it still needs an owner and a review date.
+
+## Starter checklist
+
+- Persistent memory, active context, narrative records and operational state have distinct roles.
+- Personal data is minimized, and commitments stay in their calendar or task owner.
+- Corrections update authorized current claims while preserving dated evidence.
+- Every job has a source, cadence/timezone, trigger, delivery destination, failure policy and stop or review condition.
+- Actual scheduled execution and notification delivery are verified.
+- Successful no-change checks are quiet; stale or broken checks cannot masquerade as success.
+- Repeated alerts are deduplicated, retries are bounded, and ambiguous external actions are reconciled before retrying.
+- Shelved or completed work does not keep generating reminders.
+
+For the access contract behind this work, see [Delegate to an Agent with Grants and Gates](/docs/muse/delegate-with-grants-and-gates/). For the platform context, see [Muse in a Self-Hosted Stack](/docs/muse/hosted-personal-agent-in-a-self-hosted-stack/).
+
+## Source and scope
+
+[Meta describes Muse's persistent data and scheduled work](https://research.meta.ai/blog/security-and-safety-for-ai-agents-our-approach-with-muse), reviewed October 16, 2026. The ownership model, job contract and pilot above are recommended operating practice, not evidence that a particular scheduler has been configured or tested.
