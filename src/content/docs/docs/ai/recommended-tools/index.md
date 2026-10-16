@@ -42,6 +42,8 @@ The useful pattern is not “install everything.” It is “add the smallest co
 
 If you are starting from an empty vault, follow [Set Up an Obsidian Vault for People and AI Agents](/docs/ai/recommended-tools/setup-obsidian-vault-for-ai-agents/) for our PARA structure and file, REST API, and MCP integration ladder.
 
+Already have a vault? [Close the Loop Between Your Workday and an Agent-Ready Vault](/docs/ai/recommended-tools/close-the-loop-with-an-agent-ready-vault/) turns that setup into a daily capture, ingest and verification routine for meeting notes, investigations and runbooks.
+
 ## Start with boundaries, not brands
 
 Before installing a tool, answer four questions:

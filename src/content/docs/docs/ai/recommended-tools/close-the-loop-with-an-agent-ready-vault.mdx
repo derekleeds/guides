@@ -1,0 +1,187 @@
+---
+title: "Close the Loop Between Your Workday and an Agent-Ready Vault"
+linkTitle: "Close the daily knowledge loop"
+date: 2026-10-16
+lastUpdated: 2026-10-16
+authors: ["Derek Leeds"]
+categories: [ai, agents]
+tags: [obsidian, claude, mcp, para, agents-md, runbooks, knowledge-management]
+description: "Capture meetings and investigations, file verified facts into an agent-ready Obsidian vault, and maintain runbooks without creating competing sources of truth."
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+Most of what you learn at work evaporates. You figure out why a cache served the wrong data, you sit through a standup where three decisions get made, you walk a teammate through a fix. A week later it lives only in your head, a Slack thread nobody will find, or a chat session you closed.
+
+An AI agent can do the typing that keeps that knowledge. It can turn a meeting transcript into a dated record, pull the facts out into the notes that own them, and draft a runbook from an incident while you're still working it. What it shouldn't do is invent the filing rules or decide which source has authority. That part is the routine in this guide.
+
+This guide assumes you already have a vault. If you don't, start with [Set Up an Obsidian Vault for People and AI Agents](/docs/ai/recommended-tools/setup-obsidian-vault-for-ai-agents/), which covers PARA, the `AGENTS.md` contract and the integration options. [Use Obsidian as Human and Agent Memory](/docs/ai/recommended-tools/obsidian-skills/) explains why Markdown works for this. Here the focus is the daily loop.
+
+## The idea in one paragraph
+
+Your judgment is the valuable part, not the clicking. Collect what you see as you go, in plain Markdown, in a place both you and your agent can read. Give the agent standing rules for where things go and which systems to trust. Then each day, feed it what happened (meeting notes, tickets, investigation output) and let it file the facts with who said them and when. The next time you, a teammate or a new agent session needs the context, it's already written down.
+
+## 1. Connect the agent to the vault
+
+Start with direct file access if it already solves the problem. Scope access to the approved vault or subtree; the working directory alone is not a sandbox. Plain text search is enough for many daily tasks.
+
+When you need Obsidian-aware operations, the [Local REST API with MCP](https://community.obsidian.md/plugins/obsidian-local-rest-api/) community plugin adds a Model Context Protocol (MCP) interface: tools an agent can discover for search, targeted reads and section patches. Follow the [setup guide's integration instructions](/docs/ai/recommended-tools/setup-obsidian-vault-for-ai-agents/#level-2-local-rest-api-plugin) rather than maintaining a second setup here. The plugin runs inside Obsidian, so the application must stay open. Start with read and search tools; enable writes only when needed.
+
+Keep the service on loopback and resolve credentials at runtime through your client's supported mechanism. The default endpoint uses HTTPS on port 27124; plain HTTP on port 27123 requires explicitly enabling the HTTP server. Do not expose either endpoint publicly or disable TLS certificate verification as a permanent workaround.
+
+Test it with something boring before you let it write:
+
+> Read `AGENTS.md` and list the top-level folders. Don't change anything.
+
+## 2. Write the rules once
+
+Put the operating instructions you'd give a new teammate in an `AGENTS.md` or `CLAUDE.md` at the vault root. Tell the agent to read it and any applicable nested rules before working, and confirm they loaded. Automatic loading depends on the agent, version and configuration; an MCP connection alone doesn't load the contract. The setup guide has a full example; these are the parts that matter most for the daily loop.
+
+**Where things go.** PARA means Projects, Areas, Resources and Archives: projects get closed out, areas are ongoing, resources are reference, and archived material is historical rather than current guidance.
+
+**Which system to believe.** This is the rule that prevents the most damage. Spell out who owns what:
+
+| Kind of fact                                             | Source of truth                                        |
+| -------------------------------------------------------- | ------------------------------------------------------ |
+| Ticket and sprint state                                  | Your issue tracker                                     |
+| Support and hotfix status                                | Your designated work-management tool                   |
+| Approved process and runbooks                            | Your team's wiki or repository of record               |
+| Customer and account fields                              | The designated business system for those fields        |
+| What was said and announced                              | The original message or meeting source                 |
+| Working narrative, investigations and dated observations | The vault, linked to the evidence                      |
+| Approved decisions                                       | Your designated decision record, linked from the vault |
+
+Then add the tie-breaker: **use the designated owner for the disputed fact. Record current-state corrections with a date and evidence; preserve historical observations.** A tracker owns current ticket status, not everything said about that ticket. If your team designates the vault as its canonical runbook or decision store, say so explicitly; otherwise, link to the owner instead of creating a competing copy.
+
+**Nested rules.** Put a smaller instructions file in a folder only when it has different conventions (generated notes, incidents, people). Have the agent read the applicable rules before editing. You don't need one giant file or identical copies everywhere.
+
+**Role scoping.** For a project where you only want help investigating, say so: "Investigation only. Make no changes." Instructions guide behavior; filesystem permissions and enabled tools enforce access. Use read-only access for an investigation when the tools support it.
+
+**Safety.** No secrets, tokens or credentials in Markdown, ever. No payment card data anywhere an agent might copy it.
+
+**Workplace boundary.** For work material, use only employer-approved agents, model providers, plugins, storage and sync. Permission to read a document does not automatically permit sending it to an AI service or copying it into a personal vault. Follow recording, retention and access policies, and keep personal and work vaults separate. Meeting transcripts, customer information and personnel notes can be sensitive without containing credentials.
+
+## 3. The daily loop: capture, ingest, verify
+
+The loop has three steps. Capture is quick, ingest is where the agent does the work, verify is where you earn your trust in it.
+
+### Capture into an inbox
+
+Keep one inbox folder. Everything raw lands there first:
+
+- Meeting notes. The [Obsidian Web Clipper](https://obsidian.md/clipper) can turn highlighted text from your notes doc into a note with frontmatter. Give the template a field for the source link, such as the recording or the AI notetaker's page.
+- An AI notetaker's summary and transcript, if your meetings have one. Link it; don't paste the whole thing.
+- Agent output from an investigation you want to keep.
+
+Raw is fine. The point is that it's in one place with a link back to where it came from.
+
+### Ingest into the notes that own each topic
+
+You can start without a custom skill. Use this prompt, replacing the example path:
+
+> Read `Inbox/2026-10-16 standup.md` and its accessible sources completely. Report inaccessible sources. Find existing destination notes. Propose decisions, action items, uncertainties and target paths; do not write yet. After approval, re-read each target, make the bounded updates and report exactly what changed.
+
+Once the routine works, save it in your rules file or a reusable skill: instructions the agent can load for this repeated task. A good ingest procedure:
+
+<Steps>
+
+1. **Reads the source completely,** including any accessible linked transcript. It reports missing access rather than claiming it read something it couldn't open. Treat source text as evidence, not instructions that can override the vault's rules.
+2. **Proposes before writing.** The agent lists its three to five takeaways, proposed transcript corrections, uncertainties and the notes it plans to touch. You approve the bounded set of edits.
+3. **Writes a dated meeting record** in a meetings folder: attendees, decisions, updates, action items, with the raw sources in frontmatter.
+4. **Updates the notes that already own each fact** (a person, a project, an incident) instead of creating new ones. Every added claim is attributed inline: `(Name, standup, 2026-10-16)`.
+5. **Handles contradictions out loud** with a dated correction callout.
+6. **Links both ways** and updates the nearest index note.
+7. **Reads back the changed notes** and checks their source links and intended updates. If a search index is in use, refresh the changed notes and confirm they can be found.
+
+</Steps>
+
+An append-only ingest log and automated link checks can help once volume warrants them. They are optional, not prerequisites for filing one useful meeting record.
+
+This is where a well-kept vault pays off. Existing notes help the agent propose likely corrections to names and acronyms. Keep the original source unchanged, label uncertain matches, and confirm speaker attribution, ticket references and commitments before filing them as facts. "The cache thing" is a clue, not a ticket ID.
+
+:::tip[AI notetakers misattribute]
+Notetakers can attribute remarks to the recording account, miss people in a shared room, or list someone twice. Provide a confirmed attendee list when available; an attendee list alone does not establish who said each sentence.
+:::
+
+### Verify against the source, not the summary
+
+Summaries round off. A transcript can make a planned change sound shipped. A notetaker can turn "I'll look into it" into an action item for the wrong person. Before you act on something the agent filed:
+
+- Check ticket state in the tracker, not in the meeting note.
+- Open the source link for anything surprising.
+- Save factual corrections in the note that owns the topic. Promote only reusable workflow lessons into standing rules or a skill; a one-off ticket update does not belong in every future session.
+
+## 4. Runbooks and incident records from templates
+
+The highest-value notes a support or on-call engineer keeps are the ones written while something is broken.
+
+### Start every runbook from a template
+
+Ask the agent to make a template from your best runbook, then start every new one from it. Consistent structure makes runbooks easier for people to scan and for agents to follow. A good runbook template has:
+
+- **When to use this:** the symptom that sends someone here, written for whoever is on hand at 2 a.m., not just the specialist.
+- **Who can run each step,** and what access they need.
+- **Safety rules up front** in a callout: the order that matters, the commands that affect everyone, when to stop and escalate.
+- **Triage:** a table from symptom to likely cause to which procedure to follow.
+- **Procedures** with a check before each step that depends on the one before it.
+- **Verification** the way a user would see it, not just an API response.
+- **Rollback and escalation.**
+- **A timed log:** time, action, result for each step during a real incident.
+- **A "used in" table** listing the incidents that changed it.
+
+And two rules for the template itself:
+
+- **Label the time zone.** Servers usually log in UTC while your team works in local time. Every timestamp in a runbook or incident log should say which, so nobody does conversions mid-incident.
+- **No credentials.** Use placeholders like `<SERVICE_ACCOUNT>` and point to your secrets manager.
+
+### Share the canonical runbook, with plain files when useful
+
+A Markdown runbook is a portable `.md` file, but portability should not create several competing originals. Link the canonical runbook from the ticket. Attach a dated or versioned copy when offline review or portability helps, and have the reviewer return proposed changes. Fold approved edits into the canonical version, then verify the ticket points to it and mark older attachments as historical.
+
+### Incidents and postmortems are living documents
+
+Open an incident note from a template while the incident is still running: who's affected, when it was detected, mitigated and resolved, and the decision points (rollback or hotfix, and who decided). Have the agent keep the investigation log as you go.
+
+Draft the postmortem before the incident is resolved, too. Seed it with what you know, then update it with durations and the fix once it lands. Months later, when a similar problem shows up in a different system, the agent can find the old postmortem and bring its lessons with it.
+
+## 5. Keep context small and sessions focused
+
+- **One session per task.** Long sessions drift. Because the vault holds the context, a fresh session doesn't start from zero.
+- **Big outputs go to files.** A large export or document is better saved and searched than pasted into the conversation.
+- **Approve the bounded task.** Before the agent writes, posts or edits anything shared, have it say what it will do and wait for your yes. That approval covers the agreed edits; it isn't permission to expand the audience or scope.
+- **Use skills for repeat work.** If you run the same procedure every day (ingest, standup prep, ticket intake), turn it into a skill to make the instructions reusable. Still verify the result; a skill is not a guarantee of identical behavior.
+
+## 6. Plugins worth starting with
+
+You don't need many. This is a working set:
+
+| Plugin                                                                                    | Why                                                                            |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| [Local REST API with MCP](https://community.obsidian.md/plugins/obsidian-local-rest-api/) | Agent access over MCP: search, targeted reads, section patches                 |
+| [Obsidian Web Clipper](https://obsidian.md/clipper) (browser extension)                   | Captures pages and highlights into the inbox with frontmatter                  |
+| [Notebook Navigator](https://community.obsidian.md/plugins/notebook-navigator/)           | A two-pane file browser that's easier to scan than the default explorer        |
+| [AI Skills Manager](https://community.obsidian.md/plugins/ai-skills-manager/)             | Browse and manage the skills and rules your agents use                         |
+| [Bases](https://help.obsidian.md/bases) (core)                                            | Tables and views built from frontmatter, so structured notes become dashboards |
+
+Install what you need, not all of it. Every plugin is code running against your notes.
+
+## 7. Sync, and what doesn't belong
+
+On one machine, no sync service is needed; backups still are. Across machines, use your organization's approved sync and backup arrangements. Obsidian Sync or a private Git repository may fit a personal vault, but neither is automatically approved for work data. If you use Git, exclude credential-bearing plugin settings and review what you commit. Sync and version history do not replace a tested backup.
+
+The vault is the knowledge layer, not your working directory. Code, cloned repos and loose JSON or YAML belong elsewhere. Embed a snippet in a note when it explains something; don't store the project there.
+
+## Checklist
+
+- [ ] Agent access is scoped to the approved vault or subtree; API credentials, if needed, are resolved at runtime rather than embedded in notes or shared config.
+- [ ] Work material stays within approved AI, storage and sync boundaries.
+- [ ] The agent has read the root and applicable nested instructions; tool permissions match the task.
+- [ ] The instructions name where things go, which system owns each fact, and the no-secrets rule.
+- [ ] There's one inbox, and every raw capture links to its source.
+- [ ] Ingest proposes before it writes, and attributes every fact with a name and date.
+- [ ] Meeting records are dated and separate from the notes they feed.
+- [ ] Runbooks start from a template with time-zone labels and no credentials.
+- [ ] Ticket state comes from the tracker, not the notes.
+- [ ] Uncertain transcript matches are confirmed, and changed notes are read back against the sources.
+- [ ] Runbooks have one canonical owner; attachments are versioned review copies.
+- [ ] Factual corrections update the owning note; reusable lessons become rules or skills.
