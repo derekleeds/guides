@@ -6,6 +6,10 @@ sidebar:
   label: "Section overview"
 ---
 
+<figure class="tool-hero">
+  <img src="/images/muse/hero-muse.png" alt="Blue Muse app icon connected by glowing data streams to illuminated servers" width="1680" height="720" />
+</figure>
+
 A hosted agent changes who operates the computer. It does not remove the need to decide what data the agent may read, what it may change, or how to verify its work.
 
 These guides start with Meta's Muse and the experience of working with Marlow, my Muse agent. The delegation and memory practices also apply to other agent runtimes.

@@ -8,6 +8,10 @@ sidebar:
   label: "Section overview"
 ---
 
+<figure class="tool-hero">
+  <img src="/images/hermes/hero-hermes.png" alt="Monochrome character portrait beside glowing cyan data streams and server infrastructure" width="1680" height="720" />
+</figure>
+
 Hermes Agent is a separate agent runtime used here for terminal, Discord, MCP,
 and infrastructure workflows. These guides explain the system boundaries before
 the deployment details.
