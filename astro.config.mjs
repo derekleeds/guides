@@ -90,6 +90,10 @@ export default defineConfig({
           items: [{ autogenerate: { directory: "docs/hermes" } }],
         },
         {
+          label: "Muse",
+          items: [{ autogenerate: { directory: "docs/muse" } }],
+        },
+        {
           label: "Memory architecture",
           items: [{ autogenerate: { directory: "docs/memory-management" } }],
         },
