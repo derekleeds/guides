@@ -138,6 +138,8 @@ And two rules for the template itself:
 
 A Markdown runbook is a portable `.md` file, but portability should not create several competing originals. Link the canonical runbook from the ticket. Attach a dated or versioned copy when offline review or portability helps, and have the reviewer return proposed changes. Fold approved edits into the canonical version, then verify the ticket points to it and mark older attachments as historical.
 
+A runbook often starts the other way round: someone drafts it during an incident and attaches it to the ticket before a canonical copy exists. Then the attachment is the working copy, and any vault note is a copy of it. Say so in the note, so nobody edits the wrong one. When the review is done, swap the roles. Fold the reviewer's changes into the vault note, make that note the canonical runbook, link it from the ticket, and mark the attachment as historical. Later reviews attach a dated copy, as above.
+
 ### Incidents and postmortems are living documents
 
 Open an incident note from a template while the incident is still running: who's affected, when it was detected, mitigated and resolved, and the decision points (rollback or hotfix, and who decided). Have the agent keep the investigation log as you go.
