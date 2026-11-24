@@ -4,12 +4,12 @@ This repository publishes [guides.derekleeds.cloud](https://guides.derekleeds.cl
 
 ## Stack
 
-- Astro 7.2.2
-- Starlight 0.41.7
+- Astro 7 and Starlight (exact versions in `package.json`)
 - Markdown content collections
-- Local Keystatic editor
-- pnpm 11.19.0
-- Cloudflare Pages
+- pnpm (version pinned by `packageManager` in `package.json`)
+- Cloudflare Pages, built from the GitHub mirror of Forgejo `homelab/guides`
+
+Keystatic was removed on 2026-11-24 and is deprecated. Do not reintroduce it or its React dependencies.
 
 ## Content locations
 
@@ -18,7 +18,6 @@ This repository publishes [guides.derekleeds.cloud](https://guides.derekleeds.cl
 - About and privacy: `src/content/docs/about/` and `src/content/docs/privacy/`
 - Static assets and discovery files: `public/`
 - Starlight navigation: `astro.config.mjs`
-- Keystatic collections: `keystatic.config.ts`
 
 The path `src/content/docs/docs/openclaw/example.md` maps to `/docs/openclaw/example/`. Preserve existing slugs and `/docs/...` URLs.
 
@@ -41,8 +40,6 @@ pnpm dev
 pnpm build
 pnpm format:check
 ```
-
-The local editor runs at `/keystatic` when using `pnpm dev`. It edits the same Markdown files as a text editor.
 
 ## Verification
 

@@ -2,16 +2,11 @@
 
 ## Start a change
 
-Create a feature branch from the current production branch. This repository uses `codex/` for Codex-created branches.
+Create a feature branch from `main` in Forgejo `homelab/guides`, the canonical repository.
 
 ## Edit content
 
-Choose either workflow:
-
-- Edit Markdown in `src/content/docs/`.
-- Run `pnpm dev` and use the local editor at `/keystatic`.
-
-Keystatic is a local editing interface, not a second content store. Its changes appear as normal Markdown changes in Git.
+Edit Markdown in `src/content/docs/` and preview it with `pnpm dev`.
 
 ## Preview and validate
 
@@ -50,4 +45,4 @@ The Astro migration keeps the established `/docs/...` paths. Do not rename a con
 
 ## Publish
 
-After review, merge the approved change to `main`. GitHub Actions builds and deploys the site to GitHub Pages. Confirm the workflow passes and spot-check the changed production URLs.
+Open a pull request in Forgejo. After review, merge the approved change to `main`. Forgejo mirrors `main` to GitHub, and Cloudflare Pages builds and deploys it from there. Spot-check the changed production URLs after the deployment.

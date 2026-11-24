@@ -4,6 +4,8 @@
 - Date: 2026-08-19
 - Scope: `guides.derekleeds.cloud`
 
+> **Amended 2026-11-24.** Keystatic has been removed and is no longer part of the stack; Markdown edited in Git is the only editing path. Forgejo `homelab/guides` is now the canonical repository and mirrors `main` one way to GitHub `derekleeds/guides`, which Cloudflare Pages builds from. Version numbers below are as decided in August 2026; current versions are in `package.json`. The rest of this record stands.
+
 ## Decision
 
 Keep `guides.derekleeds.cloud` and `learn.derekleeds.cloud` as separate sites. Guides remains in the `derekleeds/guides` repository, keeps its existing domain and `/docs/...` URLs, and publishes through Cloudflare Pages.
