@@ -122,17 +122,17 @@ A token injected this way wins. Hermes detects `OP_SERVICE_ACCOUNT_TOKEN` is alr
 
 ## Part 3: Design Your Vaults and Add Credentials
 
-Keep Hermes credentials separate from personal items, and do not reuse a vault another agent already has access to. A vault is the unit of grant and the unit of revocation — that is the only reason to draw the lines anywhere in particular.
+Keep Hermes credentials separate from personal items, and do not reuse a vault another agent already has access to. A vault is the unit of grant and the unit of revocation — that is the only reason to draw the lines anywhere in particular. The examples use placeholder vault names such as `<external-api-vault>`; replace them with your own.
 
 ### One vault or three?
 
 One dedicated vault is fine to start. But the credentials an agent needs are not one kind of thing, and they do not fail the same way. Splitting by blast radius makes revocation surgical, but only create or grant a vault when the install genuinely needs it:
 
-| Vault                  | Holds                                                                                   | Why it is its own vault                                                                                                                       |
-| ---------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Hermes-External-API`  | Third-party provider keys — Anthropic, OpenAI, OpenRouter, Brave, Todoist               | Metered and billable. A leak costs money and is visible in someone else's usage dashboard, not yours. Rotate freely; nothing internal breaks. |
-| `Hermes-Internal-Apps` | Credentials for self-hosted web apps — Forgejo tokens, Komodo, Grafana, Open WebUI      | Reaches your own services. A leak is a foothold, not a bill. Rotation may require touching each app.                                          |
-| `Hermes-Machine-Auth`  | Machine-to-machine material — SSH keys, mTLS certs, Tailscale auth keys, service tokens | The highest blast radius and the slowest to rotate. Most agent tasks never need it; keep it separate so it can be withheld by default.        |
+| Vault                   | Holds                                                                                   | Why it is its own vault                                                                                                                       |
+| ----------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `<external-api-vault>`  | Third-party provider keys — Anthropic, OpenAI, OpenRouter, Brave, Todoist               | Metered and billable. A leak costs money and is visible in someone else's usage dashboard, not yours. Rotate freely; nothing internal breaks. |
+| `<internal-apps-vault>` | Credentials for self-hosted web apps — Forgejo tokens, Komodo, Grafana, Open WebUI      | Reaches your own services. A leak is a foothold, not a bill. Rotation may require touching each app.                                          |
+| `<machine-auth-vault>`  | Machine-to-machine material — SSH keys, mTLS certs, Tailscale auth keys, service tokens | The highest blast radius and the slowest to rotate. Most agent tasks never need it; keep it separate so it can be withheld by default.        |
 
 The practical payoff: when a token leaks, or an experiment goes sideways, you revoke one vault's access instead of auditing every credential the agent could see. It also means the third vault is one you can simply _not_ grant on machines that do not need it.
 
@@ -142,11 +142,11 @@ This is the part that catches people. Hermes reads a single service-account toke
 
 Create one service account per Hermes install, granted only the vaults that install actually needs:
 
-| Install               | Vaults granted                                                                                      |
-| --------------------- | --------------------------------------------------------------------------------------------------- |
-| Laptop / interactive  | `Hermes-External-API`                                                                               |
-| Gateway VPS           | `Hermes-External-API`, `Hermes-Internal-Apps`                                                       |
-| Homelab GitOps runner | `Hermes-External-API`, plus only the internal-app or machine-auth vaults required for approved jobs |
+| Install               | Vaults granted                                                                                       |
+| --------------------- | ---------------------------------------------------------------------------------------------------- |
+| Laptop / interactive  | `<external-api-vault>`                                                                               |
+| Gateway VPS           | `<external-api-vault>`, `<internal-apps-vault>`                                                      |
+| Homelab GitOps runner | `<external-api-vault>`, plus only the internal-app or machine-auth vaults required for approved jobs |
 
 That gives you a revocation story per machine as well as per credential class. Losing the laptop revokes one service account and touches nothing on the gateway.
 
@@ -162,16 +162,16 @@ Create each item in the 1Password app or web interface. Use a Password item, nam
 
 ```bash
 # List titles only
-op item list --vault Hermes-External-API --format json | jq '.[].title'
+op item list --vault "<external-api-vault>" --format json | jq '.[].title'
 
 # Confirm a reference resolves — existence check, not value
-op read "op://Hermes-External-API/ANTHROPIC_API_KEY/password" > /dev/null && echo "OK" || echo "FAILED"
+op read "op://<external-api-vault>/ANTHROPIC_API_KEY/password" > /dev/null && echo "OK" || echo "FAILED"
 ```
 
 If you created items through the web UI rather than the CLI, the field label may not be `password`. Check before you write the reference:
 
 ```bash
-op item get "ANTHROPIC_API_KEY" --vault "Hermes-External-API" --format json | \
+op item get "ANTHROPIC_API_KEY" --vault "<external-api-vault>" --format json | \
   jq '[.fields[].label]'
 ```
 
@@ -203,8 +203,8 @@ hermes secrets onepassword setup \
 The reference format is `op://<vault>/<item>/<field>`:
 
 ```bash
-hermes secrets onepassword set ANTHROPIC_API_KEY "op://Hermes-External-API/ANTHROPIC_API_KEY/password"
-hermes secrets onepassword set OPENAI_API_KEY    "op://Hermes-External-API/OPENAI_API_KEY/password"
+hermes secrets onepassword set ANTHROPIC_API_KEY "op://<external-api-vault>/ANTHROPIC_API_KEY/password"
+hermes secrets onepassword set OPENAI_API_KEY    "op://<external-api-vault>/OPENAI_API_KEY/password"
 ```
 
 References are stripped and validated on the way in — a value that does not start with `op://` is rejected rather than silently stored.
@@ -416,7 +416,7 @@ The good case is multi-machine fleets, shared dev boxes, gateway VPSes — anywh
 op whoami                                                    # confirm CLI auth
 hermes secrets onepassword token                              # masked token prompt + validation
 hermes secrets onepassword setup                              # enable the integration
-hermes secrets onepassword set ANTHROPIC_API_KEY "op://Hermes-External-API/ANTHROPIC_API_KEY/password"
+hermes secrets onepassword set ANTHROPIC_API_KEY "op://<external-api-vault>/ANTHROPIC_API_KEY/password"
 hermes secrets onepassword sync                              # dry run
 hermes secrets onepassword status                            # verify
 ```
@@ -438,13 +438,13 @@ hermes secrets onepassword status                            # verify
 
 ```bash
 # List item titles, never values
-op item list --vault Hermes-External-API --format json | jq '.[].title'
+op item list --vault "<external-api-vault>" --format json | jq '.[].title'
 
 # Confirm a reference resolves
-op read "op://Hermes-External-API/ITEM/password" > /dev/null && echo "resolves: yes"
+op read "op://<external-api-vault>/ITEM/password" > /dev/null && echo "resolves: yes"
 
 # Find the real field label
-op item get "ITEM" --vault "Hermes-External-API" --format json | \
+op item get "ITEM" --vault "<external-api-vault>" --format json | \
   jq '[.fields[].label]'
 
 # Pin the binary path
@@ -455,7 +455,7 @@ which op
 
 - [ ] Vaults split by blast radius: external API, internal apps, machine auth
 - [ ] One service account per install, granted only the vaults that install needs
-- [ ] `Hermes-Machine-Auth` withheld from any install that does not need it
+- [ ] `<machine-auth-vault>` withheld from any install that does not need it
 - [ ] Token in `~/.hermes/.env` or `.op.env`, never in `config.yaml`
 - [ ] `chmod 600` on whichever file holds the token
 - [ ] Token reachable by cron, launchd, and containers — not only your login shell

@@ -73,11 +73,11 @@ op item list --vault "Your-Vault-Name"
 
 ### Create a Dedicated Vault
 
-Keep OpenClaw credentials separate from personal items:
+Keep OpenClaw credentials separate from personal items. The examples in this guide use `<api-keys-vault>` as the vault name; replace it with your own:
 
 ```bash
 # Via 1Password web UI or CLI
-op vault create "OpenClaw-API-Keys"
+op vault create "<api-keys-vault>"
 ```
 
 ### Add Credentials
@@ -89,19 +89,19 @@ For each API key your OpenClaw instance uses:
 op item create \
   --category=password \
   --title="ANTHROPIC_API_KEY" \
-  --vault="OpenClaw-API-Keys" \
+  --vault="<api-keys-vault>" \
   password="sk-ant-your-key-here"
 
 op item create \
   --category=password \
   --title="OPENROUTER_API_KEY" \
-  --vault="OpenClaw-API-Keys" \
+  --vault="<api-keys-vault>" \
   password="sk-or-v1-your-key-here"
 
 op item create \
   --category=password \
   --title="DISCORD_TOKEN" \
-  --vault="OpenClaw-API-Keys" \
+  --vault="<api-keys-vault>" \
   password="your-discord-bot-token"
 ```
 
@@ -109,10 +109,10 @@ op item create \
 
 ```bash
 # List all items (titles only, never echo values)
-op item list --vault OpenClaw-API-Keys --format json | jq '.[].title'
+op item list --vault "<api-keys-vault>" --format json | jq '.[].title'
 
 # Verify a specific item resolves (check existence, not value)
-op read "op://OpenClaw-API-Keys/ANTHROPIC_API_KEY/password" > /dev/null && echo "OK" || echo "FAILED"
+op read "op://<api-keys-vault>/ANTHROPIC_API_KEY/password" > /dev/null && echo "OK" || echo "FAILED"
 ```
 
 > **Important:** Never echo secret values to terminal, logs, or chat. Always verify with existence checks.
@@ -130,7 +130,7 @@ In `openclaw.json`, add a `secrets.providers` entry for each credential:
       "onepassword_anthropic": {
         "source": "exec",
         "command": "/usr/bin/op",
-        "args": ["read", "op://OpenClaw-API-Keys/ANTHROPIC_API_KEY/password"],
+        "args": ["read", "op://<api-keys-vault>/ANTHROPIC_API_KEY/password"],
         "jsonOnly": false,
         "passEnv": ["HOME", "OP_SERVICE_ACCOUNT_TOKEN"],
         "allowInsecurePath": true
@@ -138,7 +138,7 @@ In `openclaw.json`, add a `secrets.providers` entry for each credential:
       "onepassword_openrouter": {
         "source": "exec",
         "command": "/usr/bin/op",
-        "args": ["read", "op://OpenClaw-API-Keys/OPENROUTER_API_KEY/password"],
+        "args": ["read", "op://<api-keys-vault>/OPENROUTER_API_KEY/password"],
         "jsonOnly": false,
         "passEnv": ["HOME", "OP_SERVICE_ACCOUNT_TOKEN"],
         "allowInsecurePath": true
@@ -171,7 +171,7 @@ Most 1Password items use `password` as the field name, but watch for variations:
 Check your item's field structure:
 
 ```bash
-op item get "ITEM_NAME" --vault "OpenClaw-API-Keys" --format json | \
+op item get "ITEM_NAME" --vault "<api-keys-vault>" --format json | \
   jq '[.fields[] | select(.value != null) | .label]'
 ```
 
@@ -399,7 +399,7 @@ When you add a new integration:
 "onepassword_<name>": {
   "source": "exec",
   "command": "/usr/bin/op",
-  "args": ["read", "op://OpenClaw-API-Keys/<ITEM_TITLE>/password"],
+  "args": ["read", "op://<api-keys-vault>/<ITEM_TITLE>/password"],
   "jsonOnly": false,
   "passEnv": ["HOME", "OP_SERVICE_ACCOUNT_TOKEN"],
   "allowInsecurePath": true
@@ -413,10 +413,10 @@ When you add a new integration:
 openclaw secrets audit --check
 
 # List vault items
-op item list --vault OpenClaw-API-Keys --format json | jq '.[].title'
+op item list --vault "<api-keys-vault>" --format json | jq '.[].title'
 
 # Verify a specific item (never echo the value)
-op read "op://OpenClaw-API-Keys/ITEM/password" > /dev/null && echo "resolves: yes"
+op read "op://<api-keys-vault>/ITEM/password" > /dev/null && echo "resolves: yes"
 
 # Backup config
 cp ~/.openclaw/openclaw.json ~/.openclaw/openclaw.json.backup.$(date +%Y%m%d-%H%M%S)
