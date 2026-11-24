@@ -3,12 +3,12 @@
   "version": "2.0.0",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@11.28.9",
+  "packageManager": "pnpm@11.29.0",
   "engines": {
     "node": ">=22.12.0"
   },
   "scripts": {
-    "dev": "cross-env PUBLIC_KEYSTATIC_MODE=local astro dev",
+    "dev": "astro dev",
     "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
@@ -17,22 +17,16 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@astrojs/markdown-remark": "7.3.4",
-    "@astrojs/react": "6.0.6",
-    "@astrojs/sitemap": "3.7.4",
+    "@astrojs/markdown-remark": "7.3.10",
+    "@astrojs/sitemap": "3.7.6",
     "@astrojs/starlight": "0.42.7",
-    "@keystatic/astro": "6.0.0",
-    "@keystatic/core": "0.6.9",
-    "astro": "7.4.2",
+    "astro": "7.4.13",
     "astro-mermaid": "2.2.0",
-    "mermaid": "11.17.2",
-    "react": "19.3.1",
-    "react-dom": "19.3.1"
+    "mermaid": "11.17.2"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.12",
-    "cross-env": "10.1.0",
-    "prettier": "3.9.10",
+    "prettier": "3.10.1",
     "prettier-plugin-astro": "0.14.1",
     "typescript": "6.0.3"
   }

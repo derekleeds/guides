@@ -26,7 +26,6 @@
 | :------------------------------------------------------------------------------------ | :---------------------- | :--------------------------------------------------------------------------------------- |
 | <img src="https://cdn.simpleicons.org/astro/BC52EE" alt="Astro" width="28">           | **Astro 7 + Starlight** | Builds the static documentation site, navigation, search, and accessible page structure. |
 | <img src="https://cdn.simpleicons.org/markdown/000000" alt="Markdown" width="28">     | **Markdown and MDX**    | Stores durable, reviewable guide content.                                                |
-| <img src="https://cdn.simpleicons.org/react/61DAFB" alt="React" width="28">           | **React**               | Supports Keystatic and the small interactive surfaces that require it.                   |
 | <img src="https://cdn.simpleicons.org/typescript/3178C6" alt="TypeScript" width="28"> | **TypeScript**          | Keeps configuration and content integrations predictable.                                |
 | <img src="https://cdn.simpleicons.org/pnpm/F69220" alt="pnpm" width="28">             | **pnpm**                | Installs the pinned dependency graph and runs project checks.                            |
 | <img src="https://cdn.simpleicons.org/cloudflare/F38020" alt="Cloudflare" width="28"> | **Cloudflare Pages**    | Publishes the generated static site.                                                     |
@@ -43,7 +42,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-The site and local Keystatic editor are available at `http://localhost:4321/` and `/keystatic`.
+The site is available at `http://localhost:4321/`.
 
 ## Content
 
@@ -71,7 +70,7 @@ Astro writes the site to `dist/`.
 - [x] Publish a standalone Starlight documentation site
 - [x] Separate reusable guides from Learn journal posts
 - [x] Organize guides by technical domain
-- [x] Provide local Markdown and Keystatic editing
+- [x] Provide local Markdown editing
 - [x] Preserve stable `/docs/...` routes
 - [x] Add search, sitemap, and social metadata
 - [x] Keep Forgejo as the source of truth
