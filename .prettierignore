@@ -3,3 +3,4 @@ dist/
 .astro/
 archive/
 pnpm-lock.yaml
+.pnpm-store/
