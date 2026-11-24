@@ -124,7 +124,7 @@ The Hermes skill lives at `~/.openclaw/skills/hermes/`.
 
 ```bash
 # In ~/.openclaw/.env
-export HERMES_API_KEY=$(op read op://OpenClaw/hermes-api/key)
+export HERMES_API_KEY=$(op read "op://<vault>/hermes-api/key")
 ```
 
 ### 2.2 Skill Structure
